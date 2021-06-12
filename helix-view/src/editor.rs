@@ -1,6 +1,4 @@
-use crate::{
-    theme::Theme, tree::Tree, Document, DocumentId, LineEnding, RegisterSelection, View, ViewId,
-};
+use crate::{theme::Theme, tree::Tree, Document, DocumentId, RegisterSelection, View, ViewId};
 use tui::layout::Rect;
 
 use std::path::PathBuf;
@@ -9,7 +7,7 @@ use slotmap::SlotMap;
 
 use anyhow::Error;
 
-pub use helix_core::diagnostic::Severity;
+pub use helix_core::{diagnostic::Severity, LineEnding};
 
 #[derive(Debug)]
 pub struct Editor {
@@ -145,7 +143,7 @@ impl Editor {
 
     pub fn new_file(&mut self, action: Action) -> DocumentId {
         use helix_core::Rope;
-        let doc = Document::new(Rope::from("\n"), LineEnding::LF);
+        let doc = Document::new(Rope::from("\n"));
         let id = self.documents.insert(doc);
         self.documents[id].id = id;
         self.switch(id, action);
