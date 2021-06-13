@@ -5,9 +5,11 @@ use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
 
 use helix_core::{
-    auto_detect_line_ending, DEFAULT_LINE_ENDING, history::History,
+    auto_detect_line_ending,
+    history::History,
     syntax::{LanguageConfiguration, LOADER},
     ChangeSet, Diagnostic, LineEnding, Rope, Selection, State, Syntax, Transaction,
+    DEFAULT_LINE_ENDING,
 };
 
 use crate::{DocumentId, ViewId};
@@ -575,6 +577,20 @@ impl Document {
 
     pub fn set_diagnostics(&mut self, diagnostics: Vec<Diagnostic>) {
         self.diagnostics = diagnostics;
+    }
+
+    pub fn line_ending(&self) -> &str {
+        match self.line_ending {
+            LineEnding::Crlf => "\u{000D}\u{000A}",
+            LineEnding::LF => "\u{000A}",
+            LineEnding::Nel => "\u{0085}",
+            LineEnding::LS => "\u{2028}",
+            LineEnding::CR => "\u{000D}",
+            _ => panic!(
+                "Unexpected line ending: {:?}, expected Crlf, LF, CR, Nel, or LS.",
+                self.line_ending
+            ),
+        }
     }
 }
 

@@ -7,7 +7,7 @@ use slotmap::SlotMap;
 
 use anyhow::Error;
 
-pub use helix_core::{diagnostic::Severity};
+pub use helix_core::diagnostic::Severity;
 
 #[derive(Debug)]
 pub struct Editor {
