@@ -390,6 +390,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "helix-docs"
+version = "0.5.0"
+dependencies = [
+ "helix-term",
+]
+
+[[package]]
 name = "helix-lsp"
 version = "0.5.0"
 dependencies = [
