@@ -3,6 +3,8 @@
 | `:quit`, `:q` | Close the current view. |
 | `:quit!`, `:q!` | Close the current view forcefully (ignoring unsaved changes). |
 | `:open`, `:o` | Open a file from disk into the current view. |
+| `:buffer-close`, `:bc`, `:bclose` | Close the current buffer. |
+| `:buffer-close!`, `:bc!`, `:bclose!` | Close the current buffer forcefully (ignoring unsaved changes). |
 | `:write`, `:w` | Write changes to disk. Accepts an optional path (:write some/path.txt) |
 | `:new`, `:n` | Create a new scratch buffer. |
 | `:format`, `:fmt` | Format the file using the LSP formatter. |
@@ -17,6 +19,7 @@
 | `:write-quit-all!`, `:wqa!`, `:xa!` | Write changes from all views to disk and close all views forcefully (ignoring unsaved changes). |
 | `:quit-all`, `:qa` | Close all views. |
 | `:quit-all!`, `:qa!` | Close all views forcefully (ignoring unsaved changes). |
+| `:cquit`, `:cq` | Quit with exit code (default 1). Accepts an optional integer exit code (:cq 2). |
 | `:theme` | Change the editor theme. |
 | `:clipboard-yank` | Yank main selection into system clipboard. |
 | `:clipboard-yank-join` | Yank joined selections into system clipboard. A separator can be provided as first argument. Default value is newline. |
