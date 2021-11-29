@@ -153,11 +153,7 @@ the project root. The flake can also be used to spin up a reproducible developme
 shell for working on Helix.</p>
 <h3 id="arch-linux"><a class="header" href="#arch-linux">Arch Linux</a></h3>
 <p>Releases are available in the <code>community</code> repository.</p>
-<p>Packages are also available on AUR:</p>
-<ul>
-<li><a href="https://aur.archlinux.org/packages/helix-bin/">helix-bin</a> contains the pre-built release</li>
-<li><a href="https://aur.archlinux.org/packages/helix-git/">helix-git</a> builds the master branch</li>
-</ul>
+<p>A <a href="https://aur.archlinux.org/packages/helix-git/">helix-git</a> package is also available on the AUR, which builds the master branch.</p>
 <h2 id="build-from-source"><a class="header" href="#build-from-source">Build from source</a></h2>
 <pre><code>git clone --recurse-submodules --shallow-submodules -j8 https://github.com/helix-editor/helix
 cd helix
@@ -186,9 +182,11 @@ via the <code>HELIX_RUNTIME</code> environment variable.</p>
 <tr><td><code>/</code></td><td>Last search</td></tr>
 <tr><td><code>:</code></td><td>Last executed command</td></tr>
 <tr><td><code>&quot;</code></td><td>Last yanked text</td></tr>
+<tr><td><code>_</code></td><td>Black hole</td></tr>
 </tbody></table>
 <blockquote>
-<p>There is no special register for copying to system clipboard, instead special commands and keybindings are provided. See the <a href="keymap.html#space-mode">keymap</a> for the specifics.</p>
+<p>There is no special register for copying to system clipboard, instead special commands and keybindings are provided. See the <a href="keymap.html#space-mode">keymap</a> for the specifics.
+The black hole register works as a no-op register, meaning no data will be written to / read from it.</p>
 </blockquote>
 <h2 id="surround"><a class="header" href="#surround">Surround</a></h2>
 <p>Functionality similar to <a href="https://github.com/tpope/vim-surround">vim-surround</a> is built into
@@ -432,15 +430,16 @@ over it and is merged into the default palette.</p>
 <li><code>conditional</code> - <code>if</code>, <code>else</code></li>
 <li><code>repeat</code> - <code>for</code>, <code>while</code>, <code>loop</code></li>
 <li><code>import</code> - <code>import</code>, <code>export</code></li>
-<li>(TODO: return?)</li>
+<li><code>return</code></li>
 </ul>
 </li>
+<li><code>operator</code> - <code>or</code>, <code>in</code></li>
 <li><code>directive</code> - Preprocessor directives (<code>#if</code> in C) </li>
 <li><code>function</code> - <code>fn</code>, <code>func</code></li>
 </ul>
 </li>
 <li>
-<p><code>operator</code> - <code>||</code>, <code>+=</code>, <code>&gt;</code>, <code>or</code></p>
+<p><code>operator</code> - <code>||</code>, <code>+=</code>, <code>&gt;</code></p>
 </li>
 <li>
 <p><code>function</code></p>
@@ -557,22 +556,25 @@ over it and is merged into the default palette.</p>
 <tr><td><code>&lt;</code></td><td>Unindent selection</td><td><code>unindent</code></td></tr>
 <tr><td><code>=</code></td><td>Format selection (<strong>LSP</strong>)</td><td><code>format_selections</code></td></tr>
 <tr><td><code>d</code></td><td>Delete selection</td><td><code>delete_selection</code></td></tr>
+<tr><td><code>Alt-d</code></td><td>Delete selection, without yanking</td><td><code>delete_selection_noyank</code></td></tr>
 <tr><td><code>c</code></td><td>Change selection (delete and enter insert mode)</td><td><code>change_selection</code></td></tr>
+<tr><td><code>Alt-c</code></td><td>Change selection (delete and enter insert mode, without yanking)</td><td><code>change_selection_noyank</code></td></tr>
 <tr><td><code>Ctrl-a</code></td><td>Increment object (number) under cursor</td><td><code>increment</code></td></tr>
 <tr><td><code>Ctrl-x</code></td><td>Decrement object (number) under cursor</td><td><code>decrement</code></td></tr>
 </tbody></table>
 <h4 id="shell"><a class="header" href="#shell">Shell</a></h4>
 <table><thead><tr><th>Key</th><th>Description</th><th>Command</th></tr></thead><tbody>
 <tr><td><code>|</code></td><td>Pipe each selection through shell command, replacing with output</td><td><code>shell_pipe</code></td></tr>
-<tr><td><code>A-|</code></td><td>Pipe each selection into shell command, ignoring output</td><td><code>shell_pipe_to</code></td></tr>
+<tr><td><code>Alt-|</code></td><td>Pipe each selection into shell command, ignoring output</td><td><code>shell_pipe_to</code></td></tr>
 <tr><td><code>!</code></td><td>Run shell command, inserting output before each selection</td><td><code>shell_insert_output</code></td></tr>
-<tr><td><code>A-!</code></td><td>Run shell command, appending output after each selection</td><td><code>shell_append_output</code></td></tr>
+<tr><td><code>Alt-!</code></td><td>Run shell command, appending output after each selection</td><td><code>shell_append_output</code></td></tr>
 </tbody></table>
 <h3 id="selection-manipulation"><a class="header" href="#selection-manipulation">Selection manipulation</a></h3>
 <table><thead><tr><th>Key</th><th>Description</th><th>Command</th></tr></thead><tbody>
 <tr><td><code>s</code></td><td>Select all regex matches inside selections</td><td><code>select_regex</code></td></tr>
 <tr><td><code>S</code></td><td>Split selection into subselections on regex matches</td><td><code>split_selection</code></td></tr>
 <tr><td><code>Alt-s</code></td><td>Split selection on newlines</td><td><code>split_selection_on_newline</code></td></tr>
+<tr><td><code>&amp;</code></td><td>Align selection in columns</td><td><code>align_selections</code></td></tr>
 <tr><td><code>_</code></td><td>Trim whitespace from the selection</td><td><code>trim_selections</code></td></tr>
 <tr><td><code>;</code></td><td>Collapse selection onto a single cursor</td><td><code>collapse_selection</code></td></tr>
 <tr><td><code>Alt-;</code></td><td>Flip selection cursor and anchor</td><td><code>flip_selections</code></td></tr>
@@ -626,6 +628,7 @@ over text and not actively editing it).</p>
 <table><thead><tr><th>Key</th><th>Description</th><th>Command</th></tr></thead><tbody>
 <tr><td><code>g</code></td><td>Go to the start of the file</td><td><code>goto_file_start</code></td></tr>
 <tr><td><code>e</code></td><td>Go to the end of the file</td><td><code>goto_last_line</code></td></tr>
+<tr><td><code>f</code></td><td>Go to files in the selection</td><td><code>goto_file</code></td></tr>
 <tr><td><code>h</code></td><td>Go to the start of the line</td><td><code>goto_line_start</code></td></tr>
 <tr><td><code>l</code></td><td>Go to the end of the line</td><td><code>goto_line_end</code></td></tr>
 <tr><td><code>s</code></td><td>Go to first non-whitespace character of the line</td><td><code>goto_first_nonwhitespace</code></td></tr>
@@ -661,6 +664,8 @@ and <a href="./usage.html#textobject">textobject</a> usage.</p>
 <tr><td><code>v</code>, <code>Ctrl-v</code></td><td>Vertical right split</td><td><code>vsplit</code></td></tr>
 <tr><td><code>s</code>, <code>Ctrl-s</code></td><td>Horizontal bottom split</td><td><code>hsplit</code></td></tr>
 <tr><td><code>h</code>, <code>Ctrl-h</code>, <code>left</code></td><td>Move to left split</td><td><code>jump_view_left</code></td></tr>
+<tr><td><code>f</code></td><td>Go to files in the selection in horizontal splits</td><td><code>goto_file</code></td></tr>
+<tr><td><code>F</code></td><td>Go to files in the selection in vertical splits</td><td><code>goto_file</code></td></tr>
 <tr><td><code>j</code>, <code>Ctrl-j</code>, <code>down</code></td><td>Move to split below</td><td><code>jump_view_down</code></td></tr>
 <tr><td><code>k</code>, <code>Ctrl-k</code>, <code>up</code></td><td>Move to split above</td><td><code>jump_view_up</code></td></tr>
 <tr><td><code>l</code>, <code>Ctrl-l</code>, <code>right</code></td><td>Move to right split</td><td><code>jump_view_right</code></td></tr>
@@ -758,7 +763,7 @@ implemented for all movement commands yet.</p>
 <tr><td><code>Ctrl-u</code></td><td>Delete to start of line</td></tr>
 <tr><td><code>Ctrl-k</code></td><td>Delete to end of line</td></tr>
 <tr><td><code>backspace</code>, <code>Ctrl-h</code></td><td>Delete previous char</td></tr>
-<tr><td><code>delete</code>, <code>Ctrl-d</code></td><td>Delete previous char</td></tr>
+<tr><td><code>delete</code>, <code>Ctrl-d</code></td><td>Delete next char</td></tr>
 <tr><td><code>Ctrl-s</code></td><td>Insert a word under doc cursor, may be changed to Ctrl-r Ctrl-w later</td></tr>
 <tr><td><code>Ctrl-p</code>, <code>Up</code></td><td>Select previous history</td></tr>
 <tr><td><code>Ctrl-n</code>, <code>Down</code></td><td>Select next history</td></tr>
@@ -813,7 +818,10 @@ j = { k = &quot;normal_mode&quot; } # Maps `jk` to exit insert mode
 <tr><td>Escape</td><td><code>&quot;esc&quot;</code></td></tr>
 </tbody></table>
 <p>Keys can be disabled by binding them to the <code>no_op</code> command.</p>
-<p>Commands can be found in the source code at <a href="https://github.com/helix-editor/helix/blob/master/helix-term/src/commands.rs"><code>helix-term/src/commands.rs</code></a></p>
+<p>Commands can be found at <a href="https://docs.helix-editor.com/keymap.html">Keymap</a> Commands.</p>
+<blockquote>
+<p>Commands can also be found in the source code at <a href="https://github.com/helix-editor/helix/blob/master/helix-term/src/commands.rs"><code>helix-term/src/commands.rs</code></a> at the invocation of <code>commands!</code> macro.</p>
+</blockquote>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="hooks"><a class="header" href="#hooks">Hooks</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="languages"><a class="header" href="#languages">Languages</a></h1>
 <p>Language-specific settings and settings for particular language servers can be configured in a <code>languages.toml</code> file placed in your <a href="./configuration.html">configuration directory</a>. Helix actually uses two <code>languages.toml</code> files, the <a href="https://github.com/helix-editor/helix/blob/master/languages.toml">first one</a> is in the main helix repository; it contains the default settings for each language and is included in the helix binary at compile time. Users who want to see the available settings and options can either reference the helix repo's <code>languages.toml</code> file, or consult the table in the <a href="./guides/adding_languages.html">adding languages</a> section.</p>
