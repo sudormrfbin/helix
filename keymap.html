@@ -366,6 +366,12 @@ and <a href="./usage.html#textobject">textobject</a> usage.</p>
 <tr><td><code>]d</code></td><td>Go to next diagnostic (<strong>LSP</strong>)</td><td><code>goto_next_diag</code></td></tr>
 <tr><td><code>[D</code></td><td>Go to first diagnostic in document (<strong>LSP</strong>)</td><td><code>goto_first_diag</code></td></tr>
 <tr><td><code>]D</code></td><td>Go to last diagnostic in document (<strong>LSP</strong>)</td><td><code>goto_last_diag</code></td></tr>
+<tr><td><code>]f</code></td><td>Go to next function (<strong>TS</strong>)</td><td><code>goto_next_function</code></td></tr>
+<tr><td><code>[f</code></td><td>Go to previous function (<strong>TS</strong>)</td><td><code>goto_prev_function</code></td></tr>
+<tr><td><code>]c</code></td><td>Go to next class (<strong>TS</strong>)</td><td><code>goto_next_class</code></td></tr>
+<tr><td><code>[c</code></td><td>Go to previous class (<strong>TS</strong>)</td><td><code>goto_prev_class</code></td></tr>
+<tr><td><code>]p</code></td><td>Go to next parameter (<strong>TS</strong>)</td><td><code>goto_next_parameter</code></td></tr>
+<tr><td><code>[p</code></td><td>Go to previous parameter (<strong>TS</strong>)</td><td><code>goto_prev_parameter</code></td></tr>
 <tr><td><code>[space</code></td><td>Add newline above</td><td><code>add_newline_above</code></td></tr>
 <tr><td><code>]space</code></td><td>Add newline below</td><td><code>add_newline_below</code></td></tr>
 </tbody></table>
@@ -400,7 +406,11 @@ implemented for all movement commands yet.</p>
 <p>Keys to use within picker. Remapping currently not supported.</p>
 <table><thead><tr><th>Key</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>Up</code>, <code>Ctrl-k</code>, <code>Ctrl-p</code></td><td>Previous entry</td></tr>
+<tr><td><code>PageUp</code>, <code>Ctrl-b</code></td><td>Page up</td></tr>
 <tr><td><code>Down</code>, <code>Ctrl-j</code>, <code>Ctrl-n</code></td><td>Next entry</td></tr>
+<tr><td><code>PageDown</code>, <code>Ctrl-f</code></td><td>Page down</td></tr>
+<tr><td><code>Home</code></td><td>Go to first entry</td></tr>
+<tr><td><code>End</code></td><td>Go to last entry</td></tr>
 <tr><td><code>Ctrl-space</code></td><td>Filter options</td></tr>
 <tr><td><code>Enter</code></td><td>Open selected</td></tr>
 <tr><td><code>Ctrl-s</code></td><td>Open horizontally</td></tr>
