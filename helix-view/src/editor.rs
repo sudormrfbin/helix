@@ -3,6 +3,7 @@ use crate::{
     clipboard::{get_clipboard_provider, ClipboardProvider},
     document::{DocumentSavedEventFuture, DocumentSavedEventResult, Mode},
     graphics::{CursorKind, Rect},
+    icons::{self, Icons},
     info::Info,
     input::KeyEvent,
     theme::{self, Theme},
@@ -98,6 +99,8 @@ pub struct FilePickerConfig {
     /// WalkBuilder options
     /// Maximum Depth to recurse directories in file picker and global search. Defaults to `None`.
     pub max_depth: Option<usize>,
+    /// Enables filetype icons.
+    pub filetype_icons: bool,
 }
 
 impl Default for FilePickerConfig {
@@ -111,6 +114,7 @@ impl Default for FilePickerConfig {
             git_global: true,
             git_exclude: true,
             max_depth: None,
+            filetype_icons: true,
         }
     }
 }
@@ -691,6 +695,7 @@ pub struct Editor {
     pub registers: Registers,
     pub macro_recording: Option<(char, Vec<KeyEvent>)>,
     pub macro_replaying: Vec<char>,
+    pub icons: Icons,
     pub language_servers: helix_lsp::Registry,
     pub diagnostics: BTreeMap<lsp::Url, Vec<lsp::Diagnostic>>,
     pub diff_providers: DiffProviderRegistry,
@@ -710,6 +715,8 @@ pub struct Editor {
     /// is set here.
     pub theme: Theme,
     pub last_line_number: Option<usize>,
+    pub icons_loader: Arc<icons::Loader>,
+
     pub status_msg: Option<(Cow<'static, str>, Severity)>,
     pub autoinfo: Option<Info>,
 
@@ -781,6 +788,7 @@ impl Editor {
     pub fn new(
         mut area: Rect,
         theme_loader: Arc<theme::Loader>,
+        icons_loader: Arc<icons::Loader>,
         syn_loader: Arc<syntax::Loader>,
         config: Box<dyn DynAccess<Config>>,
     ) -> Self {
@@ -806,6 +814,7 @@ impl Editor {
             language_servers: helix_lsp::Registry::new(),
             diagnostics: BTreeMap::new(),
             diff_providers: DiffProviderRegistry::default(),
+            icons: icons_loader.default(),
             debugger: None,
             debugger_events: SelectAll::new(),
             breakpoints: HashMap::new(),
@@ -813,6 +822,7 @@ impl Editor {
             theme_loader,
             last_theme: None,
             last_line_number: None,
+            icons_loader,
             registers: Registers::default(),
             clipboard_provider: get_clipboard_provider(),
             status_msg: None,
@@ -929,6 +939,11 @@ impl Editor {
             }
         }
 
+        self._refresh();
+    }
+
+    pub fn set_icons(&mut self, icons: Icons) {
+        self.icons = icons;
         self._refresh();
     }
 

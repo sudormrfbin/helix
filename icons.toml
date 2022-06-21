@@ -1,0 +1,13 @@
+[diagnostic]
+error = "e"
+warning = "w"
+info = "i"
+notice = "n"
+
+[symbol-kind]
+variable = "v"
+function = "f"
+
+[mime-type]
+txt = "🎉"
+rs = ""

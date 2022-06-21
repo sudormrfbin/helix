@@ -40,3 +40,30 @@ pub fn user_lang_config() -> Result<toml::Value, toml::de::Error> {
 
     Ok(config)
 }
+
+/// Default built-in icons.toml.
+pub fn default_icons_config() -> toml::Value {
+    toml::from_slice(include_bytes!("../../icons.toml"))
+        .expect("Could not parse built-in icons.toml to valid toml")
+}
+
+/// User configured icons.toml file, merged with the default config.
+pub fn user_icons_config() -> Result<toml::Value, toml::de::Error> {
+    let config = crate::local_config_dirs()
+        .into_iter()
+        .chain([crate::config_dir()].into_iter())
+        .map(|path| path.join("icons.toml"))
+        .filter_map(|file| {
+            std::fs::read(&file)
+                .map(|config| toml::from_slice(&config))
+                .ok()
+        })
+        .collect::<Result<Vec<_>, _>>()?
+        .into_iter()
+        .chain([default_icons_config()].into_iter())
+        .fold(toml::Value::Table(toml::value::Table::default()), |a, b| {
+            crate::merge_toml_values(b, a, 3)
+        });
+
+    Ok(config)
+}

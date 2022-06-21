@@ -11,7 +11,7 @@ use helix_view::{
     document::DocumentSavedEventResult,
     editor::{ConfigEvent, EditorEvent},
     graphics::Rect,
-    theme,
+    icons, theme,
     tree::Layout,
     Align, Editor,
 };
@@ -156,6 +156,24 @@ impl Application {
             })
             .unwrap_or_else(|| theme_loader.default_theme(true_color));
 
+        let icons_loader = std::sync::Arc::new(icons::Loader::new(
+            &helix_loader::config_dir(),
+            &helix_loader::runtime_dir(),
+        ));
+        let icons = config
+            .icons
+            .as_ref()
+            .and_then(|icons| {
+                icons_loader
+                    .load(icons)
+                    .map_err(|e| {
+                        log::warn!("failed to load icons `{}` - {}", icons, e);
+                        e
+                    })
+                    .ok()
+            })
+            .unwrap_or_else(|| icons_loader.default());
+
         let syn_loader = std::sync::Arc::new(syntax::Loader::new(syn_loader_conf));
 
         #[cfg(not(feature = "integration"))]
@@ -171,6 +189,7 @@ impl Application {
         let mut editor = Editor::new(
             area,
             theme_loader.clone(),
+            icons_loader.clone(),
             syn_loader.clone(),
             Box::new(Map::new(Arc::clone(&config), |config: &Config| {
                 &config.editor
@@ -193,7 +212,7 @@ impl Application {
             if first.is_dir() {
                 std::env::set_current_dir(first).context("set current dir")?;
                 editor.new_file(Action::VerticalSplit);
-                let picker = ui::file_picker(".".into(), &config.load().editor);
+                let picker = ui::file_picker(".".into(), &config.load().editor, &icons);
                 compositor.push(Box::new(overlayed(picker)));
             } else {
                 let nr_of_files = args.files.len();
@@ -251,6 +270,7 @@ impl Application {
         }
 
         editor.set_theme(theme);
+        editor.set_icons(icons);
 
         #[cfg(windows)]
         let signals = futures_util::stream::empty();

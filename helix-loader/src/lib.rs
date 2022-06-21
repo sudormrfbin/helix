@@ -92,6 +92,10 @@ pub fn log_file() -> PathBuf {
     cache_dir().join("helix.log")
 }
 
+pub fn icons_config_file() -> std::path::PathBuf {
+    config_dir().join("icons.toml")
+}
+
 pub fn find_local_config_dirs() -> Vec<PathBuf> {
     let current_dir = std::env::current_dir().expect("unable to determine current directory");
     let mut directories = Vec::new();
