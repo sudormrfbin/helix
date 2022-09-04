@@ -404,6 +404,7 @@ impl FromStr for Modifier {
 ///     Style {
 ///         fg: Some(Color::Yellow),
 ///         bg: Some(Color::Red),
+///         underline: Some(Color::Reset),
 ///         add_modifier: Modifier::BOLD,
 ///         sub_modifier: Modifier::empty(),
 ///     },
@@ -429,6 +430,7 @@ impl FromStr for Modifier {
 ///     Style {
 ///         fg: Some(Color::Yellow),
 ///         bg: Some(Color::Reset),
+///         underline: Some(Color::Reset),
 ///         add_modifier: Modifier::empty(),
 ///         sub_modifier: Modifier::empty(),
 ///     },
@@ -570,7 +572,7 @@ impl Style {
     pub fn patch(mut self, other: Style) -> Style {
         self.fg = other.fg.or(self.fg);
         self.bg = other.bg.or(self.bg);
-        self.underline = other.underline.or(self.bg);
+        self.underline = other.underline.or(self.underline);
 
         self.add_modifier.remove(other.sub_modifier);
         self.add_modifier.insert(other.add_modifier);
