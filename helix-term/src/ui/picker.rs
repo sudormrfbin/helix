@@ -163,9 +163,15 @@ impl<T: Item> FilePicker<T> {
     }
 
     fn handle_idle_timeout(&mut self, cx: &mut Context) -> EventResult {
+        self.highlight_current_file(cx.editor);
+
+        EventResult::Consumed(None)
+    }
+
+    pub fn highlight_current_file(&mut self, editor: &Editor) {
         // Try to find a document in the cache
         let doc = self
-            .current_file(cx.editor)
+            .current_file(editor)
             .and_then(|(path, _range)| self.preview_cache.get_mut(&path))
             .and_then(|cache| match cache {
                 CachedPreview::Document(doc) => Some(doc),
@@ -175,12 +181,10 @@ impl<T: Item> FilePicker<T> {
         // Then attempt to highlight it if it has no language set
         if let Some(doc) = doc {
             if doc.language_config().is_none() {
-                let loader = cx.editor.syn_loader.clone();
+                let loader = editor.syn_loader.clone();
                 doc.detect_language(loader);
             }
         }
-
-        EventResult::Consumed(None)
     }
 }
 
@@ -715,28 +719,31 @@ impl<T: Item + Send + 'static> Component for DynamicPicker<T> {
     }
 
     fn handle_event(&mut self, event: &Event, cx: &mut Context) -> EventResult {
-        let prev_query = self.file_picker.picker.prompt.line().to_owned();
         let event_result = self.file_picker.handle_event(event, cx);
-        let current_query = self.file_picker.picker.prompt.line();
 
-        if *current_query == prev_query || matches!(event_result, EventResult::Ignored(_)) {
+        if !matches!(event, Event::IdleTimeout) {
             return event_result;
         }
 
+        let current_query = self.file_picker.picker.prompt.line();
         let new_options = (self.query_callback)(current_query.to_owned(), cx.editor);
 
         cx.jobs.callback(async move {
             let new_options = new_options.await?;
-            let callback: crate::job::Callback = Box::new(move |_editor, compositor| {
+            let callback: crate::job::Callback = Box::new(move |editor, compositor| {
                 // Wrapping of pickers in overlay is done outside the picker code,
                 // so this is fragile and will break if wrapped in some other widget.
-                let picker = match compositor.find_id::<Overlay<DynamicPicker<T>>>(Self::ID) {
-                    Some(overlay) => &mut overlay.content.file_picker.picker,
+                let file_picker = match compositor.find_id::<Overlay<DynamicPicker<T>>>(Self::ID) {
+                    Some(overlay) => &mut overlay.content.file_picker,
                     None => return,
                 };
-                picker.options = new_options;
-                picker.cursor = 0;
-                picker.force_score();
+                file_picker.picker.options = new_options;
+                file_picker.picker.cursor = 0;
+                file_picker.picker.force_score();
+                // This callback is triggered on the idle timeout, so we simulate the
+                // file-picker's handle_idle_timeout behavior by highlighting the
+                // currently previewed file.
+                file_picker.highlight_current_file(editor);
             });
             anyhow::Ok(callback)
         });
