@@ -700,6 +700,7 @@ pub type DynQueryCallback<T> =
 pub struct DynamicPicker<T: ui::menu::Item + Send> {
     file_picker: FilePicker<T>,
     query_callback: DynQueryCallback<T>,
+    query: String,
 }
 
 impl<T: ui::menu::Item + Send> DynamicPicker<T> {
@@ -709,6 +710,7 @@ impl<T: ui::menu::Item + Send> DynamicPicker<T> {
         Self {
             file_picker,
             query_callback,
+            query: String::new(),
         }
     }
 }
@@ -720,12 +722,14 @@ impl<T: Item + Send + 'static> Component for DynamicPicker<T> {
 
     fn handle_event(&mut self, event: &Event, cx: &mut Context) -> EventResult {
         let event_result = self.file_picker.handle_event(event, cx);
+        let current_query = self.file_picker.picker.prompt.line();
 
-        if !matches!(event, Event::IdleTimeout) {
+        if !matches!(event, Event::IdleTimeout) || self.query == *current_query {
             return event_result;
         }
 
-        let current_query = self.file_picker.picker.prompt.line();
+        self.query.clone_from(current_query);
+
         let new_options = (self.query_callback)(current_query.to_owned(), cx.editor);
 
         cx.jobs.callback(async move {
