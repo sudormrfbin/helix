@@ -725,9 +725,13 @@ impl<T: Item + 'static> Component for Picker<T> {
 
             spans.0.into_iter().fold(inner, |pos, span| {
                 let new_x = surface
+                    .set_stringn(pos.x, pos.y + i as u16, " ",  2, highlighted)
+                    .0;
+                let new_x = surface
                     .set_string_truncated(
-                        pos.x,
+                        new_x,
                         pos.y + i as u16,
+                        // TODO
                         &span.content,
                         pos.width as usize,
                         |idx| {
