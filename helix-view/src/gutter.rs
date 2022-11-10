@@ -46,7 +46,7 @@ impl GutterType {
 }
 
 pub fn diagnostic<'doc>(
-    _editor: &'doc Editor,
+    editor: &'doc Editor,
     doc: &'doc Document,
     _view: &View,
     theme: &Theme,
@@ -73,7 +73,14 @@ pub fn diagnostic<'doc>(
             // This unwrap is safe because the iterator cannot be empty as it contains at least the item found by the binary search.
             let diagnostic = diagnostics_on_line.max_by_key(|d| d.severity).unwrap();
 
-            write!(out, "●").unwrap();
+            let diagnostic_icon = match diagnostic.severity {
+                Some(Severity::Error) => editor.icons.diagnostic.error,
+                Some(Severity::Warning) | None => editor.icons.diagnostic.warning,
+                Some(Severity::Info) => editor.icons.diagnostic.info,
+                Some(Severity::Hint) => editor.icons.diagnostic.hint,
+            };
+            // write!(out, "●").unwrap();
+            write!(out, "{}", diagnostic_icon).unwrap();
             return Some(match diagnostic.severity {
                 Some(Severity::Error) => error,
                 Some(Severity::Warning) | None => warning,

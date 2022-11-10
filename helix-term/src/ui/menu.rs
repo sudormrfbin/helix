@@ -52,10 +52,18 @@ impl Item for PathBuf {
 
     fn icon(&self, icons: &Icons) -> Option<char> {
         if let Some(extension) = self.extension().and_then(|e| e.to_str()) {
-            icons.mime_type.get(extension).cloned()
+            icons
+                .mime_type
+                .get(extension)
+                .cloned()
+                .or(Some(icons.symbol_kind.file))
         } else {
             if let Some(filename) = self.file_name().and_then(|f| f.to_str()) {
-                icons.mime_type.get(filename).cloned()
+                icons
+                    .mime_type
+                    .get(filename)
+                    .cloned()
+                    .or(Some(icons.symbol_kind.file))
             } else {
                 None
             }

@@ -724,13 +724,14 @@ impl<T: Item + 'static> Component for Picker<T> {
                 .unwrap_or_default();
 
             let icon = option.icon(&cx.editor.icons);
+            let icons_enabled = cx.editor.config().picker_extended_icons;
 
             // Do not put multiple icons per line
             let mut already_put_icon = false;
 
             spans.0.into_iter().fold(inner, |pos, span| {
                 let x;
-                if !already_put_icon {
+                if !already_put_icon && icons_enabled {
                     x = surface
                         .set_stringn(
                             pos.x,
@@ -753,7 +754,11 @@ impl<T: Item + 'static> Component for Picker<T> {
                         x,
                         pos.y + i as u16,
                         &span.content,
-                        pos.width as usize,
+                        if icons_enabled {
+                            pos.width as usize - 2
+                        } else {
+                            pos.width as usize
+                        },
                         |idx| {
                             if highlights.contains(&idx) {
                                 highlighted.patch(span.style)

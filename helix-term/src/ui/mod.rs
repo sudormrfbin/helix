@@ -17,7 +17,6 @@ use crate::compositor::{Component, Compositor};
 use crate::job::{self, Callback};
 pub use completion::Completion;
 pub use editor::EditorView;
-use helix_view::icons::Icons;
 pub use markdown::Markdown;
 pub use menu::Menu;
 pub use picker::{DynamicPicker, FileLocation, FilePicker, Picker};
@@ -157,11 +156,7 @@ pub fn regex_prompt(
     cx.push_layer(Box::new(prompt));
 }
 
-pub fn file_picker(
-    root: PathBuf,
-    config: &helix_view::editor::Config,
-    icons: &Icons,
-) -> FilePicker<PathBuf> {
+pub fn file_picker(root: PathBuf, config: &helix_view::editor::Config) -> FilePicker<PathBuf> {
     use ignore::{types::TypesBuilder, WalkBuilder};
     use std::time::Instant;
 
@@ -220,9 +215,6 @@ pub fn file_picker(
         files.take(MAX).collect()
     };
     files.sort();
-
-    let filetype_icons_enabled = config.file_picker.filetype_icons;
-    let icons = icons.clone();
 
     log::debug!("file_picker init {:?}", Instant::now().duration_since(now));
 
