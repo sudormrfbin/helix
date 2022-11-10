@@ -10,20 +10,44 @@ pub struct Diagnostic {
     pub error: char,
     pub warning: char,
     pub info: char,
-    pub notice: char,
+    pub hint: char,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "kebab-case", deny_unknown_fields)]
 pub struct SymbolKind {
-    pub variable: char,
+    pub file: char,
+    pub module: char,
+    pub namespace: char,
+    pub package: char,
+    pub class: char,
+    pub method: char,
+    pub property: char,
+    pub field: char,
+    pub constructor: char,
+    pub enumeration: char,
+    pub interface: char,
     pub function: char,
+    pub variable: char,
+    pub constant: char,
+    pub string: char,
+    pub number: char,
+    pub boolean: char,
+    pub array: char,
+    pub object: char,
+    pub key: char,
+    pub null: char,
+    pub enum_member: char,
+    pub structure: char,
+    pub event: char,
+    pub operator: char,
+    pub type_parameter: char,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "kebab-case", deny_unknown_fields)]
 pub struct Icons {
-    mime_type: HashMap<String, char>,
+    pub mime_type: HashMap<String, char>,
     pub diagnostic: Diagnostic,
     pub symbol_kind: SymbolKind,
 }
@@ -36,20 +60,6 @@ pub struct Loader {
 pub static DEFAULT_ICONS: Lazy<Icons> = Lazy::new(|| {
     toml::from_slice(include_bytes!("../../icons.toml")).expect("Failed to parse default icons")
 });
-
-impl Icons {
-    pub fn mimetype_icon_for_path(&self, path: &Path) -> Option<&char> {
-        if let Some(extension) = path.extension().and_then(|e| e.to_str()) {
-            self.mime_type.get(extension)
-        } else {
-            if let Some(filename) = path.file_name().and_then(|f| f.to_str()) {
-                self.mime_type.get(filename)
-            } else {
-                None
-            }
-        }
-    }
-}
 
 impl Loader {
     /// Creates a new loader that can load icons flavors from two directories.

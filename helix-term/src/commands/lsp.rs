@@ -1,7 +1,7 @@
 use futures_util::FutureExt;
 use helix_lsp::{
     block_on,
-    lsp::{self, CodeAction, CodeActionOrCommand, DiagnosticSeverity, NumberOrString},
+    lsp::{self, CodeAction, CodeActionOrCommand, DiagnosticSeverity, NumberOrString, SymbolKind},
     util::{diagnostic_to_lsp_diagnostic, lsp_pos_to_pos, lsp_range_to_range, range_to_lsp_range},
     OffsetEncoding,
 };
@@ -93,6 +93,38 @@ impl ui::menu::Item for lsp::SymbolInformation {
             }
         }
     }
+
+    fn icon(&self, icons: &helix_view::icons::Icons) -> Option<char> {
+        match self.kind {
+            SymbolKind::FILE => Some(icons.symbol_kind.file),
+            SymbolKind::MODULE => Some(icons.symbol_kind.module),
+            SymbolKind::NAMESPACE => Some(icons.symbol_kind.namespace),
+            SymbolKind::PACKAGE => Some(icons.symbol_kind.package),
+            SymbolKind::CLASS => Some(icons.symbol_kind.class),
+            SymbolKind::METHOD => Some(icons.symbol_kind.method),
+            SymbolKind::PROPERTY => Some(icons.symbol_kind.property),
+            SymbolKind::FIELD => Some(icons.symbol_kind.field),
+            SymbolKind::CONSTRUCTOR => Some(icons.symbol_kind.constructor),
+            SymbolKind::ENUM => Some(icons.symbol_kind.enumeration),
+            SymbolKind::INTERFACE => Some(icons.symbol_kind.interface),
+            SymbolKind::FUNCTION => Some(icons.symbol_kind.function),
+            SymbolKind::VARIABLE => Some(icons.symbol_kind.variable),
+            SymbolKind::CONSTANT => Some(icons.symbol_kind.constant),
+            SymbolKind::STRING => Some(icons.symbol_kind.string),
+            SymbolKind::NUMBER => Some(icons.symbol_kind.number),
+            SymbolKind::BOOLEAN => Some(icons.symbol_kind.boolean),
+            SymbolKind::ARRAY => Some(icons.symbol_kind.array),
+            SymbolKind::OBJECT => Some(icons.symbol_kind.object),
+            SymbolKind::KEY => Some(icons.symbol_kind.key),
+            SymbolKind::NULL => Some(icons.symbol_kind.null),
+            SymbolKind::ENUM_MEMBER => Some(icons.symbol_kind.enum_member),
+            SymbolKind::STRUCT => Some(icons.symbol_kind.structure),
+            SymbolKind::EVENT => Some(icons.symbol_kind.event),
+            SymbolKind::OPERATOR => Some(icons.symbol_kind.operator),
+            SymbolKind::TYPE_PARAMETER => Some(icons.symbol_kind.type_parameter),
+            _ => None,
+        }
+    }
 }
 
 struct DiagnosticStyles {
@@ -149,6 +181,20 @@ impl ui::menu::Item for PickerDiagnostic {
             Span::styled(&self.diag.message, style),
             Span::styled(code, style),
         ])
+    }
+
+    fn icon(&self, icons: &helix_view::icons::Icons) -> Option<char> {
+        if let Some(severity) = self.diag.severity {
+            match severity {
+                DiagnosticSeverity::HINT => Some(icons.diagnostic.hint),
+                DiagnosticSeverity::INFORMATION => Some(icons.diagnostic.info),
+                DiagnosticSeverity::WARNING => Some(icons.diagnostic.warning),
+                DiagnosticSeverity::ERROR => Some(icons.diagnostic.error),
+                _ => None,
+            }
+        } else {
+            None
+        }
     }
 }
 

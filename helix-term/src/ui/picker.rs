@@ -723,15 +723,35 @@ impl<T: Item + 'static> Component for Picker<T> {
                 .fuzzy_indicies(&String::from(&spans), &self.matcher)
                 .unwrap_or_default();
 
+            let icon = option.icon(&cx.editor.icons);
+
+            // Do not put multiple icons per line
+            let mut already_put_icon = false;
+
             spans.0.into_iter().fold(inner, |pos, span| {
-                let new_x = surface
-                    .set_stringn(pos.x, pos.y + i as u16, " ",  2, highlighted)
-                    .0;
+                let x;
+                if !already_put_icon {
+                    x = surface
+                        .set_stringn(
+                            pos.x,
+                            pos.y + i as u16,
+                            if let Some(icon) = icon {
+                                format!("{} ", icon)
+                            } else {
+                                "  ".to_string()
+                            },
+                            2,
+                            highlighted,
+                        )
+                        .0;
+                    already_put_icon = true;
+                } else {
+                    x = pos.x;
+                }
                 let new_x = surface
                     .set_string_truncated(
-                        new_x,
+                        x,
                         pos.y + i as u16,
-                        // TODO
                         &span.content,
                         pos.width as usize,
                         |idx| {
