@@ -1,191 +1,191 @@
 [diagnostic]
-error = ""
-warning = ""
-info = ""
-hint = ""
+error = {icon = ""}
+warning = {icon = ""}
+info = {icon = ""}
+hint = {icon = ""}
 
 [symbol-kind]
-file = ""
-module = ""
-namespace = ""
-package = ""
-class = "ﴯ"
-method = ""
-property = ""
-field = ""
-constructor = ""
-enumeration = ""
-interface = ""
-variable = ""
-function = ""
-constant = ""
-string = ""
-number = ""
-boolean = ""
-array = ""
-object = ""
-key = ""
-null = "ﳠ"
-enum-member = ""
-structure = "פּ"
-event = ""
-operator = ""
-type-parameter = ""
+file = {icon = ""}
+module = {icon = ""}
+namespace = {icon = ""}
+package = {icon = ""}
+class = {icon = "ﴯ"}
+method = {icon = ""}
+property = {icon = ""}
+field = {icon = ""}
+constructor = {icon = ""}
+enumeration = {icon = ""}
+interface = {icon = ""}
+variable = {icon = ""}
+function = {icon = ""}
+constant = {icon = ""}
+string = {icon = ""}
+number = {icon = ""}
+boolean = {icon = ""}
+array = {icon = ""}
+object = {icon = ""}
+key = {icon = ""}
+null = {icon = "ﳠ"}
+enum-member = {icon = ""}
+structure = {icon = "פּ"}
+event = {icon = ""}
+operator = {icon = ""}
+type-parameter = {icon = ""}
 
 [mime-type]
-styl = ""
-sass = ""
-scss = ""
-htm = ""
-html = ""
-slim = ""
-haml = ""
-ejs = ""
-css = ""
-less = ""
-md = ""
-mdx = ""
-markdown = ""
-rmd = ""
-json = ""
-webmanifest = ""
-js = ""
-mjs = ""
-jsx = ""
-rb = ""
-gemspec = ""
-rake = ""
-php = ""
-py = ""
-pyc = ""
-pyo = ""
-pyd = ""
-coffee = ""
-mustache = ""
-hbs = ""
-conf = ""
-ini = ""
-yml = ""
-yaml = ""
-toml = ""
-bat = ""
-mk = ""
-jpg = ""
-jpeg = ""
-bmp = ""
-png = ""
-webp = ""
-gif = ""
-ico = ""
-twig = ""
-cpp = ""
-"c++" = ""
-cxx = ""
-cc = ""
-cp = ""
-c = ""
-cs = ""
-h = ""
-hh = ""
-hpp = ""
-hxx = ""
-hs = ""
-lhs = ""
-nix = ""
-lua = ""
-java = ""
-sh = ""
-fish = ""
-bash = ""
-zsh = ""
-ksh = ""
-csh = ""
-awk = ""
-ps1 = ""
-ml = "λ"
-mli = "λ"
-diff = ""
-db = ""
-sql = ""
-dump = ""
-clj = ""
-cljc = ""
-cljs = ""
-edn = ""
-scala = ""
-go = ""
-dart = ""
-xul = ""
-sln = ""
-suo = ""
-pl = ""
-pm = ""
-t = ""
-rss = ""
-"f#" = ""
-fsscript = ""
-fsx = ""
-fs = ""
-fsi = ""
-rs = ""
-rlib = ""
-d = ""
-erl = ""
-hrl = ""
-ex = ""
-exs = ""
-eex = ""
-leex = ""
-heex = ""
-vim = ""
-ai = ""
-psd = ""
-psb = ""
-ts = ""
-tsx = ""
-jl = ""
-pp = ""
-vue = "﵂"
-elm = ""
-swift = ""
-xcplayground = ""
-tex = "ﭨ"
-r = "ﳒ"
-rproj = "鉶"
-sol = "ﲹ"
-pem = ""
-"gruntfile.coffee" = ""
-"gruntfile.js" = ""
-"gruntfile.ls" = ""
-"gulpfile.coffee" = ""
-"gulpfile.js" = ""
-"gulpfile.ls" = ""
-"mix.lock" = ""
-"dropbox" = ""
-".ds_store" = ""
-".gitconfig" = ""
-".gitignore" = ""
-".gitattributes" = ""
-".gitlab-ci.yml" = ""
-".bashrc" = ""
-".zshrc" = ""
-".zshenv" = ""
-".zprofile" = ""
-".vimrc" = ""
-".gvimrc" = ""
-"_vimrc" = ""
-"_gvimrc" = ""
-".bashprofile" = ""
-"favicon.ico" = ""
-"license" = ""
-"node_modules" = ""
-"react.jsx" = ""
-"procfile" = ""
-"dockerfile" = ""
-"docker-compose.yml" = ""
-"rakefile" = ""
-"config.ru" = ""
-"gemfile" = ""
-"makefile" = ""
-"cmakelists.txt" = ""
-"robots.txt" = "ﮧ"
+styl = {icon = ""}
+sass = {icon = ""}
+scss = {icon = ""}
+htm = {icon = ""}
+html = {icon = ""}
+slim = {icon = ""}
+haml = {icon = ""}
+ejs = {icon = ""}
+css = {icon = ""}
+less = {icon = ""}
+md = {icon = ""}
+mdx = {icon = ""}
+markdown = {icon = ""}
+rmd = {icon = ""}
+json = {icon = ""}
+webmanifest = {icon = ""}
+js = {icon = ""}
+mjs = {icon = ""}
+jsx = {icon = ""}
+rb = {icon = ""}
+gemspec = {icon = ""}
+rake = {icon = ""}
+php = {icon = ""}
+py = {icon = ""}
+pyc = {icon = ""}
+pyo = {icon = ""}
+pyd = {icon = ""}
+coffee = {icon = ""}
+mustache = {icon = ""}
+hbs = {icon = ""}
+conf = {icon = ""}
+ini = {icon = ""}
+yml = {icon = ""}
+yaml = {icon = ""}
+toml = {icon = ""}
+bat = {icon = ""}
+mk = {icon = ""}
+jpg = {icon = ""}
+jpeg = {icon = ""}
+bmp = {icon = ""}
+png = {icon = ""}
+webp = {icon = ""}
+gif = {icon = ""}
+ico = {icon = ""}
+twig = {icon = ""}
+cpp = {icon = ""}
+"c++" = {icon = ""}
+cxx = {icon = ""}
+cc = {icon = ""}
+cp = {icon = ""}
+c = {icon = ""}
+cs = {icon = ""}
+h = {icon = ""}
+hh = {icon = ""}
+hpp = {icon = ""}
+hxx = {icon = ""}
+hs = {icon = ""}
+lhs = {icon = ""}
+nix = {icon = ""}
+lua = {icon = ""}
+java = {icon = ""}
+sh = {icon = ""}
+fish = {icon = ""}
+bash = {icon = ""}
+zsh = {icon = ""}
+ksh = {icon = ""}
+csh = {icon = ""}
+awk = {icon = ""}
+ps1 = {icon = ""}
+ml = {icon = "λ"}
+mli = {icon = "λ"}
+diff = {icon = ""}
+db = {icon = ""}
+sql = {icon = ""}
+dump = {icon = ""}
+clj = {icon = ""}
+cljc = {icon = ""}
+cljs = {icon = ""}
+edn = {icon = ""}
+scala = {icon = ""}
+go = {icon = ""}
+dart = {icon = ""}
+xul = {icon = ""}
+sln = {icon = ""}
+suo = {icon = ""}
+pl = {icon = ""}
+pm = {icon = ""}
+t = {icon = ""}
+rss = {icon = ""}
+"f#" = {icon = ""}
+fsscript = {icon = ""}
+fsx = {icon = ""}
+fs = {icon = ""}
+fsi = {icon = ""}
+rs = {icon = "", color = "#dea584"}
+rlib = {icon = ""}
+d = {icon = ""}
+erl = {icon = ""}
+hrl = {icon = ""}
+ex = {icon = ""}
+exs = {icon = ""}
+eex = {icon = ""}
+leex = {icon = ""}
+heex = {icon = ""}
+vim = {icon = ""}
+ai = {icon = ""}
+psd = {icon = ""}
+psb = {icon = ""}
+ts = {icon = ""}
+tsx = {icon = ""}
+jl = {icon = ""}
+pp = {icon = ""}
+vue = {icon = "﵂"}
+elm = {icon = ""}
+swift = {icon = ""}
+xcplayground = {icon = ""}
+tex = {icon = "ﭨ"}
+r = {icon = "ﳒ"}
+rproj = {icon = "鉶"}
+sol = {icon = "ﲹ"}
+pem = {icon = ""}
+"gruntfile.coffee" = {icon = ""}
+"gruntfile.js" = {icon = ""}
+"gruntfile.ls" = {icon = ""}
+"gulpfile.coffee" = {icon = ""}
+"gulpfile.js" = {icon = ""}
+"gulpfile.ls" = {icon = ""}
+"mix.lock" = {icon = ""}
+"dropbox" = {icon = ""}
+".ds_store" = {icon = ""}
+".gitconfig" = {icon = ""}
+".gitignore" = {icon = ""}
+".gitattributes" = {icon = ""}
+".gitlab-ci.yml" = {icon = ""}
+".bashrc" = {icon = ""}
+".zshrc" = {icon = ""}
+".zshenv" = {icon = ""}
+".zprofile" = {icon = ""}
+".vimrc" = {icon = ""}
+".gvimrc" = {icon = ""}
+"_vimrc" = {icon = ""}
+"_gvimrc" = {icon = ""}
+".bashprofile" = {icon = ""}
+"favicon.ico" = {icon = ""}
+"license" = {icon = ""}
+"node_modules" = {icon = ""}
+"react.jsx" = {icon = ""}
+"procfile" = {icon = ""}
+"dockerfile" = {icon = ""}
+"docker-compose.yml" = {icon = ""}
+"rakefile" = {icon = ""}
+"config.ru" = {icon = ""}
+"gemfile" = {icon = ""}
+"makefile" = {icon = ""}
+"cmakelists.txt" = {icon = ""}
+"robots.txt" = {icon = "ﮧ"}

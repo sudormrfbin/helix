@@ -11,7 +11,11 @@ pub use tui::widgets::{Cell, Row};
 use fuzzy_matcher::skim::SkimMatcherV2 as Matcher;
 use fuzzy_matcher::FuzzyMatcher;
 
-use helix_view::{graphics::Rect, icons::Icons, Editor};
+use helix_view::{
+    graphics::Rect,
+    icons::{Icon, Icons},
+    Editor,
+};
 use tui::layout::Constraint;
 
 pub trait Item {
@@ -34,7 +38,7 @@ pub trait Item {
         Row::new(vec![Cell::from(self.label(data))])
     }
 
-    fn icon(&self, _icons: &Icons) -> Option<char> {
+    fn icon<'a>(&self, _icons: &'a Icons) -> Option<&'a Icon> {
         None
     }
 }
@@ -50,23 +54,18 @@ impl Item for PathBuf {
             .into()
     }
 
-    fn icon(&self, icons: &Icons) -> Option<char> {
-        if let Some(extension) = self.extension().and_then(|e| e.to_str()) {
-            icons
-                .mime_type
-                .get(extension)
-                .cloned()
-                .or(Some(icons.symbol_kind.file))
-        } else {
-            if let Some(filename) = self.file_name().and_then(|f| f.to_str()) {
-                icons
-                    .mime_type
-                    .get(filename)
-                    .cloned()
-                    .or(Some(icons.symbol_kind.file))
-            } else {
-                None
+    fn icon<'a>(&self, icons: &'a Icons) -> Option<&'a Icon> {
+        if let Some(extension_or_filename) = self
+            .extension()
+            .or(self.file_name())
+            .and_then(|e| e.to_str())
+        {
+            match icons.mime_type.get(extension_or_filename) {
+                Some(i) => Some(i),
+                None => Some(&icons.symbol_kind.file),
             }
+        } else {
+            None
         }
     }
 }

@@ -737,12 +737,19 @@ impl<T: Item + 'static> Component for Picker<T> {
                             pos.x,
                             pos.y + i as u16,
                             if let Some(icon) = icon {
-                                format!("{} ", icon)
+                                format!("{} ", icon.icon_char)
                             } else {
                                 "  ".to_string()
                             },
                             2,
-                            highlighted,
+                            if let Some(icon) = icon {
+                                match icon.style {
+                                    Some(s) => s.patch(span.style),
+                                    None => highlighted.patch(span.style),
+                                }
+                            } else {
+                                highlighted.patch(span.style)
+                            },
                         )
                         .0;
                     already_put_icon = true;

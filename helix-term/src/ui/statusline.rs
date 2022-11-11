@@ -235,7 +235,13 @@ where
     if warnings > 0 {
         write(
             context,
-            context.editor.icons.diagnostic.warning.to_string(),
+            context
+                .editor
+                .icons
+                .diagnostic
+                .warning
+                .icon_char
+                .to_string(),
             // "●".to_string(),
             Some(context.editor.theme.get("warning")),
         );
@@ -245,7 +251,7 @@ where
     if errors > 0 {
         write(
             context,
-            context.editor.icons.diagnostic.error.to_string(),
+            context.editor.icons.diagnostic.error.icon_char.to_string(),
             // "●".to_string(),
             Some(context.editor.theme.get("error")),
         );

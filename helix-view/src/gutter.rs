@@ -74,13 +74,13 @@ pub fn diagnostic<'doc>(
             let diagnostic = diagnostics_on_line.max_by_key(|d| d.severity).unwrap();
 
             let diagnostic_icon = match diagnostic.severity {
-                Some(Severity::Error) => editor.icons.diagnostic.error,
-                Some(Severity::Warning) | None => editor.icons.diagnostic.warning,
-                Some(Severity::Info) => editor.icons.diagnostic.info,
-                Some(Severity::Hint) => editor.icons.diagnostic.hint,
+                Some(Severity::Error) => &editor.icons.diagnostic.error,
+                Some(Severity::Warning) | None => &editor.icons.diagnostic.warning,
+                Some(Severity::Info) => &editor.icons.diagnostic.info,
+                Some(Severity::Hint) => &editor.icons.diagnostic.hint,
             };
             // write!(out, "●").unwrap();
-            write!(out, "{}", diagnostic_icon).unwrap();
+            write!(out, "{}", diagnostic_icon.icon_char).unwrap();
             return Some(match diagnostic.severity {
                 Some(Severity::Error) => error,
                 Some(Severity::Warning) | None => warning,
