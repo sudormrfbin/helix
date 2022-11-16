@@ -165,14 +165,14 @@ impl Application {
             .as_ref()
             .and_then(|icons| {
                 icons_loader
-                    .load(icons)
+                    .load(icons, &theme)
                     .map_err(|e| {
                         log::warn!("failed to load icons `{}` - {}", icons, e);
                         e
                     })
                     .ok()
             })
-            .unwrap_or_else(|| icons_loader.default());
+            .unwrap_or_else(|| icons_loader.default(&theme));
 
         let syn_loader = std::sync::Arc::new(syntax::Loader::new(syn_loader_conf));
 

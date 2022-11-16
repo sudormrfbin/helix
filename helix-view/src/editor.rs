@@ -794,6 +794,8 @@ impl Editor {
     ) -> Self {
         let conf = config.load();
         let auto_pairs = (&conf.auto_pairs).into();
+        let theme = theme_loader.default();
+        let icons = icons_loader.default(&theme);
 
         // HAXX: offset the render area height by 1 to account for prompt/commandline
         area.height -= 1;
@@ -810,11 +812,11 @@ impl Editor {
             selected_register: None,
             macro_recording: None,
             macro_replaying: Vec::new(),
-            theme: theme_loader.default(),
+            theme,
             language_servers: helix_lsp::Registry::new(),
             diagnostics: BTreeMap::new(),
             diff_providers: DiffProviderRegistry::default(),
-            icons: icons_loader.default(),
+            icons,
             debugger: None,
             debugger_events: SelectAll::new(),
             breakpoints: HashMap::new(),

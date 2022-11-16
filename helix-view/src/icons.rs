@@ -5,6 +5,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use crate::graphics::{Color, Style};
+use crate::Theme;
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "kebab-case", deny_unknown_fields)]
@@ -23,6 +24,12 @@ impl Icon {
             style: None,
         }
     }
+
+    pub fn with_base_style(&mut self, style: Style) {
+        if self.style.is_none() {
+            self.style = Some(style);
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
@@ -31,6 +38,18 @@ pub struct Icons {
     pub mime_type: HashMap<String, Icon>,
     pub diagnostic: Diagnostic,
     pub symbol_kind: SymbolKind,
+}
+
+impl Icons {
+    pub fn set_diagnostic_icons_base_style(mut self, theme: &Theme) -> Self {
+        self.diagnostic.error.with_base_style(theme.get("error"));
+        self.diagnostic.info.with_base_style(theme.get("info"));
+        self.diagnostic.hint.with_base_style(theme.get("hint"));
+        self.diagnostic
+            .warning
+            .with_base_style(theme.get("warning"));
+        self
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
@@ -125,10 +144,11 @@ impl Loader {
         }
     }
 
-    /// Loads icons flavors first looking in the `user_dir` then in `default_dir`
-    pub fn load(&self, name: &str) -> Result<Icons, anyhow::Error> {
+    /// Loads icons flavors first looking in the `user_dir` then in `default_dir`.
+    /// The `theme` is needed in order to load default styles for diagnostic icons.
+    pub fn load(&self, name: &str, theme: &Theme) -> Result<Icons, anyhow::Error> {
         if name == "default" {
-            return Ok(self.default());
+            return Ok(self.default(theme));
         }
         let filename = format!("{}.toml", name);
 
@@ -140,7 +160,9 @@ impl Loader {
         };
 
         let data = std::fs::read(&path)?;
-        toml::from_slice(data.as_slice()).context("Failed to deserialize icon")
+        toml::from_slice(data.as_slice())
+            .and_then(|icons: Icons| Ok(icons.set_diagnostic_icons_base_style(theme)))
+            .context("Failed to deserialize icon")
     }
 
     pub fn read_names(path: &Path) -> Vec<String> {
@@ -165,8 +187,9 @@ impl Loader {
         names
     }
 
-    /// Returns the default icon flavor
-    pub fn default(&self) -> Icons {
-        DEFAULT_ICONS.clone()
+    /// Returns the default icon flavor.
+    /// The `theme` is needed in order to load default styles for diagnostic icons.
+    pub fn default(&self, theme: &Theme) -> Icons {
+        DEFAULT_ICONS.clone().set_diagnostic_icons_base_style(theme)
     }
 }
