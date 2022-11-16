@@ -27,7 +27,7 @@ pub trait Item {
         let icon_span = icons.and_then(|icons| self.icon(icons));
         let mut spans = self.label_text(data);
         if let Some(icon_span) = icon_span {
-            spans.0.push(icon_span.into());
+            spans.0.insert(0, icon_span.into());
         }
         spans
     }

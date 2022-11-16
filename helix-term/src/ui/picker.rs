@@ -729,6 +729,7 @@ impl<T: Item + 'static> Component for Picker<T> {
                 .fuzzy_indicies(&String::from(&spans), &self.matcher)
                 .unwrap_or_default();
 
+            let mut first_span = true;
             spans.0.into_iter().fold(inner, |pos, span| {
                 let new_x = surface
                     .set_string_truncated(
@@ -746,9 +747,10 @@ impl<T: Item + 'static> Component for Picker<T> {
                             }
                         },
                         true,
-                        self.truncate_start,
+                        self.truncate_start && (!first_span && icons_enabled),
                     )
                     .0;
+                first_span = false;
                 pos.clip_left(new_x - pos.x)
             });
         }

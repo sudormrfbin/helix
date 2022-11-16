@@ -709,7 +709,7 @@ pub fn code_action(cx: &mut Context) {
 
 impl ui::menu::Item for lsp::Command {
     type Data = ();
-    fn label(&self, _data: &Self::Data) -> Spans {
+    fn label_text(&self, _data: &Self::Data) -> Spans {
         self.title.as_str().into()
     }
 }
