@@ -189,7 +189,7 @@ impl Application {
         let mut editor = Editor::new(
             area,
             theme_loader.clone(),
-            icons_loader.clone(),
+            icons_loader,
             syn_loader.clone(),
             Box::new(Map::new(Arc::clone(&config), |config: &Config| {
                 &config.editor

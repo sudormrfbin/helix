@@ -98,7 +98,7 @@ where
 {
     let s: &str = Deserialize::deserialize(deserializer)?;
     let mut style = Style::default();
-    if s.len() != 0 {
+    if !s.is_empty() {
         match hex_string_to_rgb(s) {
             Ok(c) => {
                 style = style.fg(c);
@@ -161,7 +161,7 @@ impl Loader {
 
         let data = std::fs::read(&path)?;
         toml::from_slice(data.as_slice())
-            .and_then(|icons: Icons| Ok(icons.set_diagnostic_icons_base_style(theme)))
+            .map(|icons: Icons| icons.set_diagnostic_icons_base_style(theme))
             .context("Failed to deserialize icon")
     }
 
