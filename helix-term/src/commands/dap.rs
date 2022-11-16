@@ -25,7 +25,7 @@ use helix_view::handlers::dap::{breakpoints_changed, jump_to_stack_frame, select
 impl ui::menu::Item for StackFrame {
     type Data = ();
 
-    fn label(&self, _data: &Self::Data) -> Spans {
+    fn label_text(&self, _data: &Self::Data) -> Spans {
         self.name.as_str().into() // TODO: include thread_states in the label
     }
 }
@@ -33,7 +33,7 @@ impl ui::menu::Item for StackFrame {
 impl ui::menu::Item for DebugTemplate {
     type Data = ();
 
-    fn label(&self, _data: &Self::Data) -> Spans {
+    fn label_text(&self, _data: &Self::Data) -> Spans {
         self.name.as_str().into()
     }
 }
@@ -41,7 +41,7 @@ impl ui::menu::Item for DebugTemplate {
 impl ui::menu::Item for Thread {
     type Data = ThreadStates;
 
-    fn label(&self, thread_states: &Self::Data) -> Spans {
+    fn label_text(&self, thread_states: &Self::Data) -> Spans {
         format!(
             "{} ({})",
             self.name,

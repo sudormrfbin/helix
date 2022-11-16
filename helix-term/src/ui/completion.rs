@@ -33,7 +33,7 @@ impl menu::Item for CompletionItem {
             .into()
     }
 
-    fn label(&self, _data: &Self::Data) -> Spans {
+    fn label_text(&self, _data: &Self::Data) -> Spans {
         self.label.as_str().into()
     }
 

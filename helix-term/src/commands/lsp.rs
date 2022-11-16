@@ -47,7 +47,7 @@ impl ui::menu::Item for lsp::Location {
     /// Current working directory.
     type Data = PathBuf;
 
-    fn label(&self, cwdir: &Self::Data) -> Spans {
+    fn label_text(&self, cwdir: &Self::Data) -> Spans {
         // The preallocation here will overallocate a few characters since it will account for the
         // URL's scheme, which is not used most of the time since that scheme will be "file://".
         // Those extra chars will be used to avoid allocating when writing the line number (in the
@@ -81,7 +81,7 @@ impl ui::menu::Item for lsp::SymbolInformation {
     /// Path to currently focussed document
     type Data = Option<lsp::Url>;
 
-    fn label(&self, current_doc_path: &Self::Data) -> Spans {
+    fn label_text(&self, current_doc_path: &Self::Data) -> Spans {
         if current_doc_path.as_ref() == Some(&self.location.uri) {
             self.name.as_str().into()
         } else {
@@ -143,7 +143,7 @@ struct PickerDiagnostic {
 impl ui::menu::Item for PickerDiagnostic {
     type Data = (DiagnosticStyles, DiagnosticsFormat);
 
-    fn label(&self, (styles, format): &Self::Data) -> Spans {
+    fn label_text(&self, (styles, format): &Self::Data) -> Spans {
         let mut style = self
             .diag
             .severity
@@ -514,7 +514,7 @@ pub fn workspace_diagnostics_picker(cx: &mut Context) {
 
 impl ui::menu::Item for lsp::CodeActionOrCommand {
     type Data = ();
-    fn label(&self, _data: &Self::Data) -> Spans {
+    fn label_text(&self, _data: &Self::Data) -> Spans {
         match self {
             lsp::CodeActionOrCommand::CodeAction(action) => action.title.as_str().into(),
             lsp::CodeActionOrCommand::Command(command) => command.title.as_str().into(),

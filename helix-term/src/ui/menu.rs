@@ -22,20 +22,30 @@ pub trait Item {
     /// Additional editor state that is used for label calculation.
     type Data;
 
-    fn label(&self, data: &Self::Data) -> Spans;
+    /// If the `icons` parameter is set to `None`, no icon will be present in the label
+    fn label<'a>(&self, data: &Self::Data, icons: Option<&'a Icons>) -> Spans {
+        let icon_span = icons.and_then(|icons| self.icon(icons));
+        let mut spans = self.label_text(data);
+        if let Some(icon_span) = icon_span {
+            spans.0.push(icon_span.into());
+        }
+        spans
+    }
+
+    fn label_text<'a>(&self, data: &Self::Data) -> Spans;
 
     fn sort_text(&self, data: &Self::Data) -> Cow<str> {
-        let label: String = self.label(data).into();
+        let label: String = self.label(data, None).into();
         label.into()
     }
 
     fn filter_text(&self, data: &Self::Data) -> Cow<str> {
-        let label: String = self.label(data).into();
+        let label: String = self.label(data, None).into();
         label.into()
     }
 
     fn row(&self, data: &Self::Data) -> Row {
-        Row::new(vec![Cell::from(self.label(data))])
+        Row::new(vec![Cell::from(self.label(data, None))])
     }
 
     fn icon<'a>(&self, _icons: &'a Icons) -> Option<&'a Icon> {
@@ -47,7 +57,7 @@ impl Item for PathBuf {
     /// Root prefix to strip.
     type Data = PathBuf;
 
-    fn label(&self, root_path: &Self::Data) -> Spans {
+    fn label_text<'a>(&self, root_path: &Self::Data) -> Spans {
         self.strip_prefix(root_path)
             .unwrap_or(self)
             .to_string_lossy()
