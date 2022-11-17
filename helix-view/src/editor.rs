@@ -99,6 +99,8 @@ pub struct FilePickerConfig {
     /// WalkBuilder options
     /// Maximum Depth to recurse directories in file picker and global search. Defaults to `None`.
     pub max_depth: Option<usize>,
+    /// Enables icons. Defaults to false
+    pub extended_icons: bool,
 }
 
 impl Default for FilePickerConfig {
@@ -112,6 +114,7 @@ impl Default for FilePickerConfig {
             git_global: true,
             git_exclude: true,
             max_depth: None,
+            extended_icons: false,
         }
     }
 }
@@ -179,8 +182,6 @@ pub struct Config {
     pub indent_guides: IndentGuidesConfig,
     /// Whether to color modes with different colors. Defaults to `false`.
     pub color_modes: bool,
-    /// Enables extended icons in pickers. Defaults to `false`.
-    pub picker_extended_icons: bool,
 }
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -636,7 +637,6 @@ impl Default for Config {
             bufferline: BufferLine::default(),
             indent_guides: IndentGuidesConfig::default(),
             color_modes: false,
-            picker_extended_icons: false,
         }
     }
 }

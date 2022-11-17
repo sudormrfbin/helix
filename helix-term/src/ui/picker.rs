@@ -718,7 +718,7 @@ impl<T: Item + 'static> Component for Picker<T> {
                 );
             }
 
-            let icons_enabled = cx.editor.config().picker_extended_icons;
+            let icons_enabled = cx.editor.config().file_picker.extended_icons;
             let icons = if icons_enabled {
                 Some(&cx.editor.icons)
             } else {
