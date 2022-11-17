@@ -816,21 +816,22 @@ fn icons(
     event: PromptEvent,
 ) -> anyhow::Result<()> {
     let true_color = cx.editor.config.load().true_color || crate::true_color();
-    match event {
-        PromptEvent::Validate => {
-            if let Some(flavor_name) = args.first() {
-                let icons = cx
-                    .editor
-                    .icons_loader
-                    .load(flavor_name, &cx.editor.theme)
-                    .with_context(|| "Icons flavor does not exist")?;
-                // if !(true_color || theme.is_16_color()) {
-                //     bail!("Unsupported theme: theme requires true color support");
-                // }
-                cx.editor.set_icons(icons);
-            }
+    if let PromptEvent::Validate = event {
+        if let Some(flavor_name) = args.first() {
+            let icons = cx
+                .editor
+                .icons_loader
+                .load(flavor_name, &cx.editor.theme)
+                .with_context(|| "Icons flavor does not exist")?;
+            // if !(true_color || theme.is_16_color()) {
+            //     bail!("Unsupported theme: theme requires true color support");
+            // }
+            cx.editor.set_icons(icons);
+        } else {
+            let name = cx.editor.icons.name().to_string();
+
+            cx.editor.set_status(name);
         }
-        _ => (),
     };
 
     Ok(())

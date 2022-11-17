@@ -1,3 +1,5 @@
+name = "nerdfonts"
+
 [diagnostic]
 error = {icon = ""}
 warning = {icon = ""}

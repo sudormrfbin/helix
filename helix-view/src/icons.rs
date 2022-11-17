@@ -7,6 +7,29 @@ use std::path::{Path, PathBuf};
 use crate::graphics::{Color, Style};
 use crate::Theme;
 
+/// The style of an icon can either be defined by the TOML file, or by the theme.
+/// We need to remember that in order to reload the icons colors when the theme changes.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum IconStyle {
+    Custom(Style),
+    Default(Style),
+}
+
+impl Default for IconStyle {
+    fn default() -> Self {
+        IconStyle::Default(Style::default())
+    }
+}
+
+impl From<IconStyle> for Style {
+    fn from(icon_style: IconStyle) -> Self {
+        match icon_style {
+            IconStyle::Custom(style) => style,
+            IconStyle::Default(style) => style,
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "kebab-case", deny_unknown_fields)]
 pub struct Icon {
@@ -14,20 +37,14 @@ pub struct Icon {
     pub icon_char: char,
     #[serde(default)]
     #[serde(deserialize_with = "icon_color_to_style", rename = "color")]
-    pub style: Option<Style>,
+    pub style: Option<IconStyle>,
 }
 
 impl Icon {
-    pub fn plain(icon_char: char) -> Self {
-        Self {
-            icon_char,
-            style: None,
-        }
-    }
-
-    pub fn with_base_style(&mut self, style: Style) {
-        if self.style.is_none() {
-            self.style = Some(style);
+    /// Loads a given style if the icon style is undefined or based on a default value
+    pub fn with_default_style(&mut self, style: Style) {
+        if self.style.is_none() || matches!(self.style, Some(IconStyle::Default(_))) {
+            self.style = Some(IconStyle::Default(style));
         }
     }
 }
@@ -35,20 +52,24 @@ impl Icon {
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "kebab-case", deny_unknown_fields)]
 pub struct Icons {
+    pub name: String,
     pub mime_type: Option<HashMap<String, Icon>>,
     pub diagnostic: Diagnostic,
     pub symbol_kind: Option<SymbolKind>,
 }
 
 impl Icons {
-    pub fn set_diagnostic_icons_base_style(mut self, theme: &Theme) -> Self {
-        self.diagnostic.error.with_base_style(theme.get("error"));
-        self.diagnostic.info.with_base_style(theme.get("info"));
-        self.diagnostic.hint.with_base_style(theme.get("hint"));
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn set_diagnostic_icons_base_style(&mut self, theme: &Theme) {
+        self.diagnostic.error.with_default_style(theme.get("error"));
+        self.diagnostic.info.with_default_style(theme.get("info"));
+        self.diagnostic.hint.with_default_style(theme.get("hint"));
         self.diagnostic
             .warning
-            .with_base_style(theme.get("warning"));
-        self
+            .with_default_style(theme.get("warning"));
     }
 }
 
@@ -92,7 +113,7 @@ pub struct SymbolKind {
     pub type_parameter: Icon,
 }
 
-fn icon_color_to_style<'de, D>(deserializer: D) -> Result<Option<Style>, D::Error>
+fn icon_color_to_style<'de, D>(deserializer: D) -> Result<Option<IconStyle>, D::Error>
 where
     D: serde::Deserializer<'de>,
 {
@@ -107,7 +128,7 @@ where
                 log::error!("{}", e);
             }
         };
-        Ok(Some(style))
+        Ok(Some(IconStyle::Custom(style)))
     } else {
         Ok(None)
     }
@@ -131,8 +152,9 @@ pub struct Loader {
     default_dir: PathBuf,
 }
 
-pub static DEFAULT_ICONS: Lazy<Icons> = Lazy::new(|| {
-    toml::from_slice(include_bytes!("../../icons.toml")).expect("Failed to parse default icons")
+pub static DEFAULT_ICONS: Lazy<Icons> = Lazy::new(|| Icons {
+    name: "default".into(),
+    ..toml::from_slice(include_bytes!("../../icons.toml")).expect("Failed to parse default icons")
 });
 
 impl Loader {
@@ -160,9 +182,17 @@ impl Loader {
         };
 
         let data = std::fs::read(&path)?;
-        toml::from_slice(data.as_slice())
-            .map(|icons: Icons| icons.set_diagnostic_icons_base_style(theme))
-            .context("Failed to deserialize icon")
+        let icons = toml::from_slice(data.as_slice())
+            .map(|mut icons: Icons| {
+                icons.set_diagnostic_icons_base_style(theme);
+                icons
+            })
+            .context("Failed to deserialize icon")?;
+
+        Ok(Icons {
+            name: name.into(),
+            ..icons
+        })
     }
 
     pub fn read_names(path: &Path) -> Vec<String> {
@@ -190,6 +220,8 @@ impl Loader {
     /// Returns the default icon flavor.
     /// The `theme` is needed in order to load default styles for diagnostic icons.
     pub fn default(&self, theme: &Theme) -> Icons {
-        DEFAULT_ICONS.clone().set_diagnostic_icons_base_style(theme)
+        let mut icons = DEFAULT_ICONS.clone();
+        icons.set_diagnostic_icons_base_style(theme);
+        icons
     }
 }
