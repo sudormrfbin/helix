@@ -96,34 +96,38 @@ impl ui::menu::Item for lsp::SymbolInformation {
     }
 
     fn icon<'a>(&self, icons: &'a helix_view::icons::Icons) -> Option<&'a Icon> {
-        match self.kind {
-            SymbolKind::FILE => Some(&icons.symbol_kind.file),
-            SymbolKind::MODULE => Some(&icons.symbol_kind.module),
-            SymbolKind::NAMESPACE => Some(&icons.symbol_kind.namespace),
-            SymbolKind::PACKAGE => Some(&icons.symbol_kind.package),
-            SymbolKind::CLASS => Some(&icons.symbol_kind.class),
-            SymbolKind::METHOD => Some(&icons.symbol_kind.method),
-            SymbolKind::PROPERTY => Some(&icons.symbol_kind.property),
-            SymbolKind::FIELD => Some(&icons.symbol_kind.field),
-            SymbolKind::CONSTRUCTOR => Some(&icons.symbol_kind.constructor),
-            SymbolKind::ENUM => Some(&icons.symbol_kind.enumeration),
-            SymbolKind::INTERFACE => Some(&icons.symbol_kind.interface),
-            SymbolKind::FUNCTION => Some(&icons.symbol_kind.function),
-            SymbolKind::VARIABLE => Some(&icons.symbol_kind.variable),
-            SymbolKind::CONSTANT => Some(&icons.symbol_kind.constant),
-            SymbolKind::STRING => Some(&icons.symbol_kind.string),
-            SymbolKind::NUMBER => Some(&icons.symbol_kind.number),
-            SymbolKind::BOOLEAN => Some(&icons.symbol_kind.boolean),
-            SymbolKind::ARRAY => Some(&icons.symbol_kind.array),
-            SymbolKind::OBJECT => Some(&icons.symbol_kind.object),
-            SymbolKind::KEY => Some(&icons.symbol_kind.key),
-            SymbolKind::NULL => Some(&icons.symbol_kind.null),
-            SymbolKind::ENUM_MEMBER => Some(&icons.symbol_kind.enum_member),
-            SymbolKind::STRUCT => Some(&icons.symbol_kind.structure),
-            SymbolKind::EVENT => Some(&icons.symbol_kind.event),
-            SymbolKind::OPERATOR => Some(&icons.symbol_kind.operator),
-            SymbolKind::TYPE_PARAMETER => Some(&icons.symbol_kind.type_parameter),
-            _ => None,
+        if let Some(symbol_kind_icons) = &icons.symbol_kind {
+            match self.kind {
+                SymbolKind::FILE => Some(&symbol_kind_icons.file),
+                SymbolKind::MODULE => Some(&symbol_kind_icons.module),
+                SymbolKind::NAMESPACE => Some(&symbol_kind_icons.namespace),
+                SymbolKind::PACKAGE => Some(&symbol_kind_icons.package),
+                SymbolKind::CLASS => Some(&symbol_kind_icons.class),
+                SymbolKind::METHOD => Some(&symbol_kind_icons.method),
+                SymbolKind::PROPERTY => Some(&symbol_kind_icons.property),
+                SymbolKind::FIELD => Some(&symbol_kind_icons.field),
+                SymbolKind::CONSTRUCTOR => Some(&symbol_kind_icons.constructor),
+                SymbolKind::ENUM => Some(&symbol_kind_icons.enumeration),
+                SymbolKind::INTERFACE => Some(&symbol_kind_icons.interface),
+                SymbolKind::FUNCTION => Some(&symbol_kind_icons.function),
+                SymbolKind::VARIABLE => Some(&symbol_kind_icons.variable),
+                SymbolKind::CONSTANT => Some(&symbol_kind_icons.constant),
+                SymbolKind::STRING => Some(&symbol_kind_icons.string),
+                SymbolKind::NUMBER => Some(&symbol_kind_icons.number),
+                SymbolKind::BOOLEAN => Some(&symbol_kind_icons.boolean),
+                SymbolKind::ARRAY => Some(&symbol_kind_icons.array),
+                SymbolKind::OBJECT => Some(&symbol_kind_icons.object),
+                SymbolKind::KEY => Some(&symbol_kind_icons.key),
+                SymbolKind::NULL => Some(&symbol_kind_icons.null),
+                SymbolKind::ENUM_MEMBER => Some(&symbol_kind_icons.enum_member),
+                SymbolKind::STRUCT => Some(&symbol_kind_icons.structure),
+                SymbolKind::EVENT => Some(&symbol_kind_icons.event),
+                SymbolKind::OPERATOR => Some(&symbol_kind_icons.operator),
+                SymbolKind::TYPE_PARAMETER => Some(&symbol_kind_icons.type_parameter),
+                _ => None,
+            }
+        } else {
+            None
         }
     }
 }

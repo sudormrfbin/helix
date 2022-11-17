@@ -32,7 +32,7 @@ pub trait Item {
         spans
     }
 
-    fn label_text<'a>(&self, data: &Self::Data) -> Spans;
+    fn label_text(&self, data: &Self::Data) -> Spans;
 
     fn sort_text(&self, data: &Self::Data) -> Cow<str> {
         let label: String = self.label(data, None).into();
@@ -64,15 +64,27 @@ impl Item for PathBuf {
             .into()
     }
 
+    /// Returns the icon for a filetype.
+    /// If not was found, it falls back on the `file` symbolkind icon, if available.
     fn icon<'a>(&self, icons: &'a Icons) -> Option<&'a Icon> {
         if let Some(extension_or_filename) = self
             .extension()
-            .or(self.file_name())
+            .or_else(|| self.file_name())
             .and_then(|e| e.to_str())
         {
-            match icons.mime_type.get(extension_or_filename) {
-                Some(i) => Some(i),
-                None => Some(&icons.symbol_kind.file),
+            if let Some(mime_type_icons) = &icons.mime_type {
+                match mime_type_icons.get(extension_or_filename) {
+                    Some(i) => Some(i),
+                    None => {
+                        if let Some(symbol_kind_icons) = &icons.symbol_kind {
+                            Some(&symbol_kind_icons.file)
+                        } else {
+                            None
+                        }
+                    }
+                }
+            } else {
+                None
             }
         } else {
             None

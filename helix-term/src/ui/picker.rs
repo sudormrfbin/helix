@@ -747,7 +747,12 @@ impl<T: Item + 'static> Component for Picker<T> {
                             }
                         },
                         true,
-                        self.truncate_start && (!first_span && icons_enabled),
+                        // Do not truncate the icons
+                        if icons_enabled {
+                            self.truncate_start && (!first_span)
+                        } else {
+                            self.truncate_start
+                        },
                     )
                     .0;
                 first_span = false;

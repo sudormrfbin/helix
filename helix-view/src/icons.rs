@@ -35,9 +35,9 @@ impl Icon {
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "kebab-case", deny_unknown_fields)]
 pub struct Icons {
-    pub mime_type: HashMap<String, Icon>,
+    pub mime_type: Option<HashMap<String, Icon>>,
     pub diagnostic: Diagnostic,
-    pub symbol_kind: SymbolKind,
+    pub symbol_kind: Option<SymbolKind>,
 }
 
 impl Icons {
