@@ -119,11 +119,11 @@ impl ui::menu::Item for lsp::SymbolInformation {
                 SymbolKind::OBJECT => symbol_kind_icons.get("object"),
                 SymbolKind::KEY => symbol_kind_icons.get("key"),
                 SymbolKind::NULL => symbol_kind_icons.get("null"),
-                SymbolKind::ENUM_MEMBER => symbol_kind_icons.get("enum_member"),
+                SymbolKind::ENUM_MEMBER => symbol_kind_icons.get("enum-member"),
                 SymbolKind::STRUCT => symbol_kind_icons.get("structure"),
                 SymbolKind::EVENT => symbol_kind_icons.get("event"),
                 SymbolKind::OPERATOR => symbol_kind_icons.get("operator"),
-                SymbolKind::TYPE_PARAMETER => symbol_kind_icons.get("type_parameter"),
+                SymbolKind::TYPE_PARAMETER => symbol_kind_icons.get("type-parameter"),
                 _ => None,
             }
         } else {

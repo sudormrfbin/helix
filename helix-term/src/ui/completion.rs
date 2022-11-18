@@ -60,12 +60,12 @@ impl menu::Item for CompletionItem {
                 Some(lsp::CompletionItemKind::FILE) => "file",
                 Some(lsp::CompletionItemKind::REFERENCE) => "reference",
                 Some(lsp::CompletionItemKind::FOLDER) => "folder",
-                Some(lsp::CompletionItemKind::ENUM_MEMBER) => "enum_member",
+                Some(lsp::CompletionItemKind::ENUM_MEMBER) => "enum-member",
                 Some(lsp::CompletionItemKind::CONSTANT) => "constant",
                 Some(lsp::CompletionItemKind::STRUCT) => "struct",
                 Some(lsp::CompletionItemKind::EVENT) => "event",
                 Some(lsp::CompletionItemKind::OPERATOR) => "operator",
-                Some(lsp::CompletionItemKind::TYPE_PARAMETER) => "type_param",
+                Some(lsp::CompletionItemKind::TYPE_PARAMETER) => "type-param",
                 Some(kind) => {
                     log::error!("Received unknown completion item kind: {:?}", kind);
                     ""
