@@ -77,7 +77,7 @@ impl Item for PathBuf {
                     Some(i) => Some(i),
                     None => {
                         if let Some(symbol_kind_icons) = &icons.symbol_kind {
-                            Some(&symbol_kind_icons.file)
+                            symbol_kind_icons.get("file")
                         } else {
                             None
                         }

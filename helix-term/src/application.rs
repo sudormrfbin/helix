@@ -165,7 +165,7 @@ impl Application {
             .as_ref()
             .and_then(|icons| {
                 icons_loader
-                    .load(icons, &theme)
+                    .load(icons, &theme, true_color)
                     .map_err(|e| {
                         log::warn!("failed to load icons `{}` - {}", icons, e);
                         e

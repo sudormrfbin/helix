@@ -55,7 +55,7 @@ pub struct Icons {
     pub name: String,
     pub mime_type: Option<HashMap<String, Icon>>,
     pub diagnostic: Diagnostic,
-    pub symbol_kind: Option<SymbolKind>,
+    pub symbol_kind: Option<HashMap<String, Icon>>,
 }
 
 impl Icons {
@@ -63,6 +63,7 @@ impl Icons {
         &self.name
     }
 
+    /// Set theme defined styles to diagnostic icons
     pub fn set_diagnostic_icons_base_style(&mut self, theme: &Theme) {
         self.diagnostic.error.with_default_style(theme.get("error"));
         self.diagnostic.info.with_default_style(theme.get("info"));
@@ -70,6 +71,24 @@ impl Icons {
         self.diagnostic
             .warning
             .with_default_style(theme.get("warning"));
+    }
+
+    /// Set the default style for all icons
+    pub fn reset_styles(&mut self) {
+        if let Some(mime_type_icons) = &mut self.mime_type {
+            for (_, icon) in mime_type_icons.iter_mut() {
+                icon.style = Some(IconStyle::Default(Style::default()));
+            }
+        }
+        if let Some(symbol_kind_icons) = &mut self.symbol_kind {
+            for (_, icon) in symbol_kind_icons.iter_mut() {
+                icon.style = Some(IconStyle::Default(Style::default()));
+            }
+        }
+        self.diagnostic.error.style = Some(IconStyle::Default(Style::default()));
+        self.diagnostic.warning.style = Some(IconStyle::Default(Style::default()));
+        self.diagnostic.hint.style = Some(IconStyle::Default(Style::default()));
+        self.diagnostic.info.style = Some(IconStyle::Default(Style::default()));
     }
 }
 
@@ -168,7 +187,12 @@ impl Loader {
 
     /// Loads icons flavors first looking in the `user_dir` then in `default_dir`.
     /// The `theme` is needed in order to load default styles for diagnostic icons.
-    pub fn load(&self, name: &str, theme: &Theme) -> Result<Icons, anyhow::Error> {
+    pub fn load(
+        &self,
+        name: &str,
+        theme: &Theme,
+        true_color: bool,
+    ) -> Result<Icons, anyhow::Error> {
         if name == "default" {
             return Ok(self.default(theme));
         }
@@ -182,12 +206,18 @@ impl Loader {
         };
 
         let data = std::fs::read(&path)?;
-        let icons = toml::from_slice(data.as_slice())
+        let mut icons = toml::from_slice(data.as_slice())
             .map(|mut icons: Icons| {
                 icons.set_diagnostic_icons_base_style(theme);
                 icons
             })
             .context("Failed to deserialize icon")?;
+
+        // Remove all styles when there is no truecolor support.
+        // Not classy, but less cumbersome than trying to pass a parameter to a deserializer.
+        if !true_color {
+            icons.reset_styles();
+        }
 
         Ok(Icons {
             name: name.into(),

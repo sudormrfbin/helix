@@ -821,7 +821,7 @@ fn icons(
             let icons = cx
                 .editor
                 .icons_loader
-                .load(flavor_name, &cx.editor.theme)
+                .load(flavor_name, &cx.editor.theme, true_color)
                 .with_context(|| "Icons flavor does not exist")?;
             // if !(true_color || theme.is_16_color()) {
             //     bail!("Unsupported theme: theme requires true color support");
