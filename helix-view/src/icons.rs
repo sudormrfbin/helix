@@ -255,3 +255,28 @@ impl Loader {
         icons
     }
 }
+
+pub fn icon_from_path<'a>(filepath: &Path, icons: &'a Icons) -> Option<&'a Icon> {
+    if let Some(extension_or_filename) = filepath
+        .extension()
+        .or_else(|| filepath.file_name())
+        .and_then(|e| e.to_str())
+    {
+        if let Some(mime_type_icons) = &icons.mime_type {
+            match mime_type_icons.get(extension_or_filename) {
+                Some(i) => Some(i),
+                None => {
+                    if let Some(symbol_kind_icons) = &icons.symbol_kind {
+                        symbol_kind_icons.get("file")
+                    } else {
+                        None
+                    }
+                }
+            }
+        } else {
+            None
+        }
+    } else {
+        None
+    }
+}
