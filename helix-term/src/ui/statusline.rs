@@ -3,7 +3,7 @@ use helix_lsp::lsp::DiagnosticSeverity;
 use helix_view::{
     document::{Mode, SCRATCH_BUFFER_NAME},
     graphics::Rect,
-    icons::icon_from_path,
+    icons::{icon_from_path, Icon},
     theme::Style,
     Document, Editor, View,
 };
@@ -21,6 +21,7 @@ pub struct RenderContext<'a> {
     pub focused: bool,
     pub spinners: &'a ProgressSpinners,
     pub parts: RenderBuffer<'a>,
+    pub filetype_icon: Option<&'a Icon>,
 }
 
 impl<'a> RenderContext<'a> {
@@ -38,6 +39,10 @@ impl<'a> RenderContext<'a> {
             focused,
             spinners,
             parts: RenderBuffer::default(),
+            filetype_icon: match doc.path() {
+                Some(path) => icon_from_path(path, &editor.icons),
+                None => None,
+            },
         }
     }
 }
@@ -417,21 +422,16 @@ where
     write(context, format!(" {} ", file_type), None);
 }
 
-/// TODO: need to implement a cache with correspondance between buffer and icon
-///       That cache will then be emptied when the theme or icon flavor gets reloaded
-///       It should be implemented as a method of `Icon`
 fn render_file_type_icon<F>(context: &mut RenderContext, write: F)
 where
     F: Fn(&mut RenderContext, String, Option<Style>) + Copy,
 {
-    if let Some(path) = context.doc.path() {
-        if let Some(icon) = icon_from_path(path, &context.editor.icons) {
-            write(
-                context,
-                format!("{}", icon.icon_char),
-                icon.style.map(|icons_style| icons_style.into()),
-            )
-        }
+    if let Some(icon) = context.filetype_icon {
+        write(
+            context,
+            format!("{}", icon.icon_char),
+            icon.style.map(|icons_style| icons_style.into()),
+        )
     }
 }
 

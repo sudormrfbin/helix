@@ -165,10 +165,10 @@ type-parameter = {icon = ""}
 "lua" = { icon = "", color = "#51a0cf" }
 "luau" = { icon = "", color = "#51a0cf" }
 "makefile" = { icon = "", color = "#6d8086" }
-"markdown" = { icon = "", color = "#519aba" }
+"markdown" = { icon = "", color = "#d74c4c" }
 "material" = { icon = "", color = "#B83998" }
-"md" = { icon = "" }
-"mdx" = { icon = "", color = "#519aba" }
+"md" = { icon = "", color = "#d74c4c" }
+"mdx" = { icon = "", color = "#d74c4c" }
 "mint" = { icon = "", color = "#87c095" }
 "mix.lock" = { icon = "", color = "#a074c4" }
 "mjs" = { icon = "", color = "#f1e05a" }
