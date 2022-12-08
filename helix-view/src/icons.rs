@@ -101,37 +101,6 @@ pub struct Diagnostic {
     pub hint: Icon,
 }
 
-#[derive(Debug, Clone, PartialEq, Deserialize)]
-#[serde(rename_all = "kebab-case", deny_unknown_fields)]
-pub struct SymbolKind {
-    pub file: Icon,
-    pub module: Icon,
-    pub namespace: Icon,
-    pub package: Icon,
-    pub class: Icon,
-    pub method: Icon,
-    pub property: Icon,
-    pub field: Icon,
-    pub constructor: Icon,
-    pub enumeration: Icon,
-    pub interface: Icon,
-    pub function: Icon,
-    pub variable: Icon,
-    pub constant: Icon,
-    pub string: Icon,
-    pub number: Icon,
-    pub boolean: Icon,
-    pub array: Icon,
-    pub object: Icon,
-    pub key: Icon,
-    pub null: Icon,
-    pub enum_member: Icon,
-    pub structure: Icon,
-    pub event: Icon,
-    pub operator: Icon,
-    pub type_parameter: Icon,
-}
-
 fn icon_color_to_style<'de, D>(deserializer: D) -> Result<Option<IconStyle>, D::Error>
 where
     D: serde::Deserializer<'de>,
