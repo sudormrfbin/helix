@@ -239,9 +239,10 @@ pub mod completers {
     use crate::ui::prompt::Completion;
     use fuzzy_matcher::skim::SkimMatcherV2 as Matcher;
     use fuzzy_matcher::FuzzyMatcher;
+    use helix_loader::read_loadable_toml_names;
     use helix_view::document::SCRATCH_BUFFER_NAME;
+    use helix_view::icons;
     use helix_view::{editor::Config, Editor};
-    use helix_view::{icons, theme};
     use once_cell::sync::Lazy;
     use std::borrow::Cow;
     use std::cmp::Reverse;
@@ -281,8 +282,8 @@ pub mod completers {
     }
 
     pub fn theme(_editor: &Editor, input: &str) -> Vec<Completion> {
-        let mut names = theme::Loader::read_names(&helix_loader::runtime_dir().join("themes"));
-        names.extend(theme::Loader::read_names(
+        let mut names = read_loadable_toml_names(&helix_loader::runtime_dir().join("themes"));
+        names.extend(read_loadable_toml_names(
             &helix_loader::config_dir().join("themes"),
         ));
         names.push("default".into());

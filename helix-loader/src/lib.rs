@@ -1,8 +1,10 @@
 pub mod config;
 pub mod grammar;
 
+use anyhow::{anyhow, Context, Result};
 use etcetera::base_strategy::{choose_base_strategy, BaseStrategy};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
+use toml::Value;
 
 pub const VERSION_AND_GIT_HASH: &str = env!("VERSION_AND_GIT_HASH");
 
@@ -126,8 +128,6 @@ pub fn find_local_config_dirs() -> Vec<PathBuf> {
 /// where one usually wants to override or add to the array instead of
 /// replacing it altogether.
 pub fn merge_toml_values(left: toml::Value, right: toml::Value, merge_depth: usize) -> toml::Value {
-    use toml::Value;
-
     fn get_name(v: &Value) -> Option<&str> {
         v.get("name").and_then(Value::as_str)
     }
@@ -179,6 +179,104 @@ pub fn merge_toml_values(left: toml::Value, right: toml::Value, merge_depth: usi
         // Catch everything else we didn't handle, and use the right value
         (_, value) => value,
     }
+}
+
+/// This trait allows theme and icon flavors to be loaded from TOML files, with inheritance
+pub trait FlavorLoader<T> {
+    fn user_dir(&self) -> &Path;
+    fn default_dir(&self) -> &Path;
+    fn log_type_display(&self) -> String;
+
+    /// Load a flavor first looking in the `self.user_dir()` then in `self.default_dir()`
+    fn load(&self, name: &str) -> Result<T>;
+
+    // Returns the path to the flavor with the name
+    // With `only_default_dir` as false the path will first search for the user path
+    // disabled it ignores the user path and returns only the default path
+    fn path(&self, name: &str, only_default_dir: bool) -> PathBuf {
+        let filename = format!("{}.toml", name);
+
+        let user_path = self.user_dir().join(&filename);
+        if !only_default_dir && user_path.exists() {
+            user_path
+        } else {
+            self.default_dir().join(filename)
+        }
+    }
+
+    /// Loads the flavor data as `toml::Value` first from the `user_dir` then in `default_dir`
+    fn load_toml(&self, path: PathBuf) -> Result<Value> {
+        let data = std::fs::read(&path)?;
+
+        toml::from_slice(data.as_slice()).context("Failed to deserialize flavor")
+    }
+
+    /// Merge one theme into the parent theme
+    fn merge_flavors(&self, parent_flavor_toml: Value, flavor_toml: Value) -> Value;
+
+    /// Load the flavor and its parent recursively and merge them.
+    /// `base_flavor_name` is the flavor from the config.toml, used to prevent some circular loading scenarios.
+    fn load_flavor(
+        &self,
+        name: &str,
+        base_flavor_name: &str,
+        only_default_dir: bool,
+    ) -> Result<Value> {
+        let path = self.path(name, only_default_dir);
+        let flavor_toml = self.load_toml(path)?;
+
+        let inherits = flavor_toml.get("inherits");
+
+        let flavor_toml = if let Some(parent_flavor_name) = inherits {
+            let parent_flavor_name = parent_flavor_name.as_str().ok_or_else(|| {
+                anyhow!(
+                    "{}: expected 'inherits' to be a string: {}",
+                    self.log_type_display(),
+                    parent_flavor_name
+                )
+            })?;
+
+            let parent_flavor_toml =
+                self.default_data(parent_flavor_name)
+                    .unwrap_or(self.load_flavor(
+                        parent_flavor_name,
+                        base_flavor_name,
+                        base_flavor_name == parent_flavor_name,
+                    )?);
+
+            self.merge_flavors(parent_flavor_toml, flavor_toml)
+        } else {
+            flavor_toml
+        };
+
+        Ok(flavor_toml)
+    }
+
+    /// Lists all flavor names available in default and user directory
+    fn names(&self) -> Vec<String> {
+        let mut names = read_loadable_toml_names(self.user_dir());
+        names.extend(read_loadable_toml_names(self.default_dir()));
+        names
+    }
+
+    /// Get the data for the defaults
+    fn default_data(&self, name: &str) -> Option<Value>;
+}
+
+/// Get the names of the TOML documents within a directory
+pub fn read_loadable_toml_names(path: &Path) -> Vec<String> {
+    std::fs::read_dir(path)
+        .map(|entries| {
+            entries
+                .filter_map(|entry| {
+                    let entry = entry.ok()?;
+                    let path = entry.path();
+                    (path.extension()? == "toml")
+                        .then(|| path.file_stem().unwrap().to_string_lossy().into_owned())
+                })
+                .collect()
+        })
+        .unwrap_or_default()
 }
 
 #[cfg(test)]
