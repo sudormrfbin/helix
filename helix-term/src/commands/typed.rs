@@ -4,7 +4,6 @@ use crate::job::Job;
 
 use super::*;
 
-use helix_loader::FlavorLoader;
 use helix_view::{
     apply_transaction,
     editor::{Action, CloseError, ConfigEvent},

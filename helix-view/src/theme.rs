@@ -64,22 +64,9 @@ impl Loader {
     pub fn base16_default(&self) -> Theme {
         BASE16_DEFAULT_THEME.clone()
     }
-}
 
-impl FlavorLoader<Theme> for Loader {
-    fn user_dir(&self) -> &Path {
-        &self.user_dir
-    }
-
-    fn default_dir(&self) -> &Path {
-        &self.default_dir
-    }
-
-    fn log_type_display(&self) -> String {
-        "Theme".into()
-    }
-
-    fn load(&self, name: &str) -> Result<Theme> {
+    /// Load a theme first looking in the `user_dir` then in `default_dir`
+    pub fn load(&self, name: &str) -> Result<Theme> {
         if name == "default" {
             return Ok(self.default());
         }
@@ -93,6 +80,20 @@ impl FlavorLoader<Theme> for Loader {
             name: name.into(),
             ..theme
         })
+    }
+}
+
+impl FlavorLoader<Theme> for Loader {
+    fn user_dir(&self) -> &Path {
+        &self.user_dir
+    }
+
+    fn default_dir(&self) -> &Path {
+        &self.default_dir
+    }
+
+    fn log_type_display(&self) -> String {
+        "Theme".into()
     }
 
     fn merge_flavors(&self, parent_flavor_toml: Value, flavor_toml: Value) -> Value {

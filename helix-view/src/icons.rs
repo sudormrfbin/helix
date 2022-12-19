@@ -1,8 +1,9 @@
-use anyhow::Context;
+use helix_loader::{merge_toml_values, read_loadable_toml_names, FlavorLoader};
 use once_cell::sync::Lazy;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use toml::Value;
 
 use crate::graphics::{Color, Style};
 use crate::Theme;
@@ -165,22 +166,7 @@ impl Loader {
         if name == "default" {
             return Ok(self.default(theme));
         }
-        let filename = format!("{}.toml", name);
-
-        let user_path = self.user_dir.join(&filename);
-        let path = if user_path.exists() {
-            user_path
-        } else {
-            self.default_dir.join(filename)
-        };
-
-        let data = std::fs::read(&path)?;
-        let mut icons = toml::from_slice(data.as_slice())
-            .map(|mut icons: Icons| {
-                icons.set_diagnostic_icons_base_style(theme);
-                icons
-            })
-            .context("Failed to deserialize icon")?;
+        let mut icons: Icons = self.load_flavor(name, name, false).map(Icons::from)?;
 
         // Remove all styles when there is no truecolor support.
         // Not classy, but less cumbersome than trying to pass a parameter to a deserializer.
@@ -194,25 +180,10 @@ impl Loader {
         })
     }
 
-    pub fn read_names(path: &Path) -> Vec<String> {
-        std::fs::read_dir(path)
-            .map(|entries| {
-                entries
-                    .filter_map(|entry| {
-                        let entry = entry.ok()?;
-                        let path = entry.path();
-                        (path.extension()? == "toml")
-                            .then(|| path.file_stem().unwrap().to_string_lossy().into_owned())
-                    })
-                    .collect()
-            })
-            .unwrap_or_default()
-    }
-
     /// Lists all icons flavors names available in default and user directory
     pub fn names(&self) -> Vec<String> {
-        let mut names = Self::read_names(&self.user_dir);
-        names.extend(Self::read_names(&self.default_dir));
+        let mut names = read_loadable_toml_names(&self.user_dir);
+        names.extend(read_loadable_toml_names(&self.default_dir));
         names
     }
 
@@ -222,6 +193,47 @@ impl Loader {
         let mut icons = DEFAULT_ICONS.clone();
         icons.set_diagnostic_icons_base_style(theme);
         icons
+    }
+}
+
+impl From<Value> for Icons {
+    fn from(value: Value) -> Self {
+        // Delete the `inherits` value to prevent cyclic loading
+        let toml_str = value
+            .to_string()
+            .lines()
+            .filter(|line| !line.contains("inherits"))
+            .collect::<Vec<&str>>()
+            .join("\n");
+        match toml::from_str(&toml_str) {
+            Ok(icons) => icons,
+            Err(e) => {
+                log::error!("Failed to load icons, falling back to default: {}\n", e);
+                DEFAULT_ICONS.clone()
+            }
+        }
+    }
+}
+
+impl FlavorLoader<Icons> for Loader {
+    fn user_dir(&self) -> &Path {
+        &self.user_dir
+    }
+
+    fn default_dir(&self) -> &Path {
+        &self.default_dir
+    }
+
+    fn log_type_display(&self) -> String {
+        "Icons".into()
+    }
+
+    fn merge_flavors(
+        &self,
+        parent_flavor_toml: toml::Value,
+        flavor_toml: toml::Value,
+    ) -> toml::Value {
+        merge_toml_values(parent_flavor_toml, flavor_toml, 3)
     }
 }
 

@@ -187,9 +187,6 @@ pub trait FlavorLoader<T> {
     fn default_dir(&self) -> &Path;
     fn log_type_display(&self) -> String;
 
-    /// Load a flavor first looking in the `self.user_dir()` then in `self.default_dir()`
-    fn load(&self, name: &str) -> Result<T>;
-
     // Returns the path to the flavor with the name
     // With `only_default_dir` as false the path will first search for the user path
     // disabled it ignores the user path and returns only the default path
