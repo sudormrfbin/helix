@@ -91,6 +91,40 @@ impl Icons {
         self.diagnostic.hint.style = Some(IconStyle::Default(Style::default()));
         self.diagnostic.info.style = Some(IconStyle::Default(Style::default()));
     }
+
+    pub fn icon_from_filetype<'a>(&'a self, filetype: &str) -> Option<&'a Icon> {
+        if let Some(mime_type_icons) = &self.mime_type {
+            mime_type_icons.get(filetype)
+        } else {
+            None
+        }
+    }
+
+    /// Returns a reference to an appropriate icon for the specified file path, with a default "file" icon if none is found
+    pub fn icon_from_path<'a>(&'a self, filepath: &Path) -> Option<&'a Icon> {
+        if let Some(extension_or_filename) = filepath
+            .extension()
+            .or_else(|| filepath.file_name())
+            .and_then(|e| e.to_str())
+        {
+            if let Some(mime_type_icons) = &self.mime_type {
+                match mime_type_icons.get(extension_or_filename) {
+                    Some(i) => Some(i),
+                    None => {
+                        if let Some(symbol_kind_icons) = &self.symbol_kind {
+                            symbol_kind_icons.get("file")
+                        } else {
+                            None
+                        }
+                    }
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
@@ -234,39 +268,5 @@ impl FlavorLoader<Icons> for Loader {
         flavor_toml: toml::Value,
     ) -> toml::Value {
         merge_toml_values(parent_flavor_toml, flavor_toml, 3)
-    }
-}
-
-pub fn icon_from_filetype<'a>(filetype: &str, icons: &'a Icons) -> Option<&'a Icon> {
-    if let Some(mime_type_icons) = &icons.mime_type {
-        mime_type_icons.get(filetype)
-    } else {
-        None
-    }
-}
-
-/// Returns a reference to an appropriate icon for the specified file path, with a default "file" icon if none is found
-pub fn icon_from_path<'a>(filepath: &Path, icons: &'a Icons) -> Option<&'a Icon> {
-    if let Some(extension_or_filename) = filepath
-        .extension()
-        .or_else(|| filepath.file_name())
-        .and_then(|e| e.to_str())
-    {
-        if let Some(mime_type_icons) = &icons.mime_type {
-            match mime_type_icons.get(extension_or_filename) {
-                Some(i) => Some(i),
-                None => {
-                    if let Some(symbol_kind_icons) = &icons.symbol_kind {
-                        symbol_kind_icons.get("file")
-                    } else {
-                        None
-                    }
-                }
-            }
-        } else {
-            None
-        }
-    } else {
-        None
     }
 }

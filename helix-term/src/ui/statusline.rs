@@ -3,7 +3,7 @@ use helix_lsp::lsp::DiagnosticSeverity;
 use helix_view::{
     document::{Mode, SCRATCH_BUFFER_NAME},
     graphics::Rect,
-    icons::{icon_from_filetype, icon_from_path, Icon},
+    icons::Icon,
     theme::Style,
     Document, Editor, View,
 };
@@ -34,7 +34,7 @@ impl<'a> RenderContext<'a> {
     ) -> Self {
         // Determine icon based on filetype if possible
         let mut filetype_icon = match doc.path() {
-            Some(path) => icon_from_path(path, &editor.icons),
+            Some(path) => editor.icons.icon_from_path(path),
             None => None,
         };
         // Otherwise based on language name
@@ -45,7 +45,7 @@ impl<'a> RenderContext<'a> {
                         helix_core::syntax::FileType::Extension(s) => s,
                         helix_core::syntax::FileType::Suffix(s) => s,
                     };
-                    filetype_icon = icon_from_filetype(filetype_str, &editor.icons);
+                    filetype_icon = editor.icons.icon_from_filetype(filetype_str);
                     if filetype_icon.is_some() {
                         break;
                     }

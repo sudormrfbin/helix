@@ -13,7 +13,7 @@ use fuzzy_matcher::FuzzyMatcher;
 
 use helix_view::{
     graphics::Rect,
-    icons::{icon_from_path, Icon, Icons},
+    icons::{Icon, Icons},
     Editor,
 };
 use tui::layout::Constraint;
@@ -68,7 +68,7 @@ impl Item for PathBuf {
     /// Returns the icon for a filetype.
     /// If not was found, it falls back on the `file` symbolkind icon, if available.
     fn icon<'a>(&self, icons: &'a Icons) -> Option<&'a Icon> {
-        icon_from_path(self, icons)
+        icons.icon_from_path(self)
     }
 }
 
