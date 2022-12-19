@@ -237,6 +237,15 @@ impl FlavorLoader<Icons> for Loader {
     }
 }
 
+pub fn icon_from_filetype<'a>(filetype: &str, icons: &'a Icons) -> Option<&'a Icon> {
+    if let Some(mime_type_icons) = &icons.mime_type {
+        mime_type_icons.get(filetype)
+    } else {
+        None
+    }
+}
+
+/// Returns a reference to an appropriate icon for the specified file path, with a default "file" icon if none is found
 pub fn icon_from_path<'a>(filepath: &Path, icons: &'a Icons) -> Option<&'a Icon> {
     if let Some(extension_or_filename) = filepath
         .extension()
