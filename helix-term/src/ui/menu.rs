@@ -23,29 +23,30 @@ pub trait Item {
     type Data;
 
     /// If the `icons` parameter is set to `None`, no icon will be present in the label
-    fn label<'a>(&self, data: &Self::Data, icons: Option<&'a Icons>) -> Spans {
+    /// Returns the label and a boolean telling if an icon has been found for the label or not
+    fn label<'a>(&self, data: &Self::Data, icons: Option<&'a Icons>) -> (Spans, bool) {
         let icon_span = icons.and_then(|icons| self.icon(icons));
         let mut spans = self.label_text(data);
         if let Some(icon_span) = icon_span {
             spans.0.insert(0, icon_span.into());
         }
-        spans
+        (spans, icon_span.is_some())
     }
 
     fn label_text(&self, data: &Self::Data) -> Spans;
 
     fn sort_text(&self, data: &Self::Data) -> Cow<str> {
-        let label: String = self.label(data, None).into();
+        let label: String = self.label(data, None).0.into();
         label.into()
     }
 
     fn filter_text(&self, data: &Self::Data) -> Cow<str> {
-        let label: String = self.label(data, None).into();
+        let label: String = self.label(data, None).0.into();
         label.into()
     }
 
     fn row(&self, data: &Self::Data) -> Row {
-        Row::new(vec![Cell::from(self.label(data, None))])
+        Row::new(vec![Cell::from(self.label(data, None).0)])
     }
 
     fn icon<'a>(&self, _icons: &'a Icons) -> Option<&'a Icon> {

@@ -718,16 +718,20 @@ impl<T: Item + 'static> Component for Picker<T> {
                 );
             }
 
-            let icons_enabled = cx.editor.config().file_picker.extended_icons;
-            let icons = if icons_enabled {
+            // When icons are enabled, they are placed as the first column,
+            // so we do not want to truncate the start, and we have to offset
+            // the highlights.
+            let icons = if cx.editor.config().file_picker.extended_icons {
                 Some(&cx.editor.icons)
             } else {
                 None
             };
-            let spans = option.label(&self.editor_data, icons);
+
+            let (spans, found_icon) = option.label(&self.editor_data, icons);
             let (_score, highlights) = FuzzyQuery::new(self.prompt.line())
                 .fuzzy_indicies(&String::from(&spans), &self.matcher)
                 .unwrap_or_default();
+            let idx_offset = if found_icon { 2 } else { 0 };
 
             let mut first_span = true;
             spans.0.into_iter().fold(inner, |pos, span| {
@@ -738,7 +742,7 @@ impl<T: Item + 'static> Component for Picker<T> {
                         &span.content,
                         pos.width as usize,
                         |idx| {
-                            if highlights.contains(&idx) {
+                            if highlights.contains(&(idx + idx_offset)) {
                                 highlighted.patch(span.style)
                             } else if is_active {
                                 selected.patch(span.style)
@@ -748,7 +752,7 @@ impl<T: Item + 'static> Component for Picker<T> {
                         },
                         true,
                         // Do not truncate the icons
-                        if icons_enabled {
+                        if found_icon {
                             self.truncate_start && (!first_span)
                         } else {
                             self.truncate_start
