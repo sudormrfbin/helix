@@ -175,9 +175,13 @@ pub struct Loader {
     default_dir: PathBuf,
 }
 
-pub static DEFAULT_ICONS: Lazy<Icons> = Lazy::new(|| Icons {
+pub static DEFAULT_ICONS: Lazy<Value> = Lazy::new(|| {
+    toml::from_slice(include_bytes!("../../icons.toml")).expect("Failed to parse default icons")
+});
+
+pub static DEFAULT_ICONS_DATA: Lazy<Icons> = Lazy::new(|| Icons {
     name: "default".into(),
-    ..toml::from_slice(include_bytes!("../../icons.toml")).expect("Failed to parse default icons")
+    ..Icons::from(DEFAULT_ICONS.clone())
 });
 
 impl Loader {
@@ -224,7 +228,7 @@ impl Loader {
     /// Returns the default icon flavor.
     /// The `theme` is needed in order to load default styles for diagnostic icons.
     pub fn default(&self, theme: &Theme) -> Icons {
-        let mut icons = DEFAULT_ICONS.clone();
+        let mut icons = DEFAULT_ICONS_DATA.clone();
         icons.set_diagnostic_icons_base_style(theme);
         icons
     }
@@ -243,7 +247,7 @@ impl From<Value> for Icons {
             Ok(icons) => icons,
             Err(e) => {
                 log::error!("Failed to load icons, falling back to default: {}\n", e);
-                DEFAULT_ICONS.clone()
+                DEFAULT_ICONS_DATA.clone()
             }
         }
     }
@@ -268,5 +272,13 @@ impl FlavorLoader<Icons> for Loader {
         flavor_toml: toml::Value,
     ) -> toml::Value {
         merge_toml_values(parent_flavor_toml, flavor_toml, 3)
+    }
+
+    fn default_data(&self, name: &str) -> Option<Value> {
+        if name == "default" {
+            Some(DEFAULT_ICONS.clone())
+        } else {
+            None
+        }
     }
 }

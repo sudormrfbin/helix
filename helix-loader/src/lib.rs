@@ -233,13 +233,20 @@ pub trait FlavorLoader<T> {
                 )
             })?;
 
-            let parent_flavor_toml =
-                self.default_data(parent_flavor_name)
-                    .unwrap_or(self.load_flavor(
-                        parent_flavor_name,
-                        base_flavor_name,
-                        base_flavor_name == parent_flavor_name,
-                    )?);
+            log::error!("INHERITS: {}", parent_flavor_name);
+            match self.default_data(parent_flavor_name) {
+                Some(_d) => log::error!("SOME"),
+                None => log::error!("None"),
+            }
+
+            let parent_flavor_toml = match self.default_data(parent_flavor_name) {
+                Some(p) => p,
+                None => self.load_flavor(
+                    parent_flavor_name,
+                    base_flavor_name,
+                    base_flavor_name == parent_flavor_name,
+                )?,
+            };
 
             self.merge_flavors(parent_flavor_toml, flavor_toml)
         } else {
