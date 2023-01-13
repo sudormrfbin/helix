@@ -32,25 +32,26 @@ impl<'a> RenderContext<'a> {
         focused: bool,
         spinners: &'a ProgressSpinners,
     ) -> Self {
-        // Determine icon based on filetype if possible
-        let mut filetype_icon = match doc.path() {
-            Some(path) => editor.icons.icon_from_path(path),
-            None => None,
-        };
-        // Otherwise based on language name
-        if filetype_icon.is_none() {
-            if let Some(language_config) = doc.language_config() {
-                for filetype in &language_config.file_types {
-                    let filetype_str = match filetype {
-                        helix_core::syntax::FileType::Extension(s) => s,
-                        helix_core::syntax::FileType::Suffix(s) => s,
-                    };
-                    filetype_icon = editor.icons.icon_from_filetype(filetype_str);
-                    if filetype_icon.is_some() {
-                        break;
-                    }
+        // Determine icon based on language name if possible
+        let mut filetype_icon: Option<&'a Icon> = None;
+        if let Some(language_config) = doc.language_config() {
+            for filetype in &language_config.file_types {
+                let filetype_str = match filetype {
+                    helix_core::syntax::FileType::Extension(s) => s,
+                    helix_core::syntax::FileType::Suffix(s) => s,
+                };
+                filetype_icon = editor.icons.icon_from_filetype(filetype_str);
+                if filetype_icon.is_some() {
+                    break;
                 }
             }
+        }
+        // Otherwise based on filetype
+        if filetype_icon.is_none() {
+            filetype_icon = match doc.path() {
+                Some(path) => editor.icons.icon_from_path(path),
+                None => None,
+            };
         }
 
         RenderContext {
