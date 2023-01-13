@@ -99,8 +99,6 @@ pub struct FilePickerConfig {
     /// WalkBuilder options
     /// Maximum Depth to recurse directories in file picker and global search. Defaults to `None`.
     pub max_depth: Option<usize>,
-    /// Enables icons. Defaults to false
-    pub extended_icons: bool,
 }
 
 impl Default for FilePickerConfig {
@@ -114,7 +112,27 @@ impl Default for FilePickerConfig {
             git_global: true,
             git_exclude: true,
             max_depth: None,
-            extended_icons: false,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case", default, deny_unknown_fields)]
+pub struct IconsConfig {
+    /// Globally enables or disables icons. Defaults to `false`.
+    pub enable: bool,
+    /// Enables icons in front of buffer names in bufferline. Defaults to `true`
+    pub bufferline: bool,
+    /// Enables icons in front of items in the picker. Defaults to `true`
+    pub picker: bool,
+}
+
+impl Default for IconsConfig {
+    fn default() -> Self {
+        Self {
+            enable: false,
+            bufferline: true,
+            picker: true,
         }
     }
 }
@@ -182,6 +200,8 @@ pub struct Config {
     pub indent_guides: IndentGuidesConfig,
     /// Whether to color modes with different colors. Defaults to `false`.
     pub color_modes: bool,
+    /// Icons configuration
+    pub icons: IconsConfig,
 }
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -629,6 +649,7 @@ impl Default for Config {
             completion_trigger_len: 2,
             auto_info: true,
             file_picker: FilePickerConfig::default(),
+            icons: IconsConfig::default(),
             statusline: StatusLineConfig::default(),
             cursor_shape: CursorShapeConfig::default(),
             true_color: false,

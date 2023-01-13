@@ -670,8 +670,31 @@ impl EditorView {
 
         let mut x = viewport.x;
         let current_doc = view!(editor).doc;
+        let config = editor.config();
+        let icons_enabled = config.icons.enable && config.icons.bufferline;
 
         for doc in editor.documents() {
+            // Determine icon based on filetype if possible
+            let mut filetype_icon = match doc.path() {
+                Some(path) => editor.icons.icon_from_path(path),
+                None => None,
+            };
+            // Otherwise based on language name
+            if filetype_icon.is_none() {
+                if let Some(language_config) = doc.language_config() {
+                    for filetype in &language_config.file_types {
+                        let filetype_str = match filetype {
+                            helix_core::syntax::FileType::Extension(s) => s,
+                            helix_core::syntax::FileType::Suffix(s) => s,
+                        };
+                        filetype_icon = editor.icons.icon_from_filetype(filetype_str);
+                        if filetype_icon.is_some() {
+                            break;
+                        }
+                    }
+                }
+            }
+
             let fname = doc
                 .path()
                 .unwrap_or(&scratch)
@@ -690,6 +713,22 @@ impl EditorView {
             let used_width = viewport.x.saturating_sub(x);
             let rem_width = surface.area.width.saturating_sub(used_width);
 
+            if icons_enabled {
+                if let Some(icon) = filetype_icon {
+                    x = surface
+                        .set_stringn(
+                            x,
+                            viewport.y,
+                            format!(" {}", icon.icon_char),
+                            rem_width as usize,
+                            match icon.style {
+                                Some(s) => style.patch(s.into()),
+                                None => style,
+                            },
+                        )
+                        .0;
+                }
+            }
             x = surface
                 .set_stringn(x, viewport.y, text, rem_width as usize, style)
                 .0;

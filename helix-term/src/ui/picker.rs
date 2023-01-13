@@ -652,6 +652,7 @@ impl<T: Item + 'static> Component for Picker<T> {
         let text_style = cx.editor.theme.get("ui.text");
         let selected = cx.editor.theme.get("ui.text.focus");
         let highlighted = cx.editor.theme.get("special").add_modifier(Modifier::BOLD);
+        let config = cx.editor.config();
 
         // -- Render the frame:
         // clear area
@@ -721,7 +722,7 @@ impl<T: Item + 'static> Component for Picker<T> {
             // When icons are enabled, they are placed as the first column,
             // so we do not want to truncate the start, and we have to offset
             // the highlights.
-            let icons = if cx.editor.config().file_picker.extended_icons {
+            let icons = if config.icons.enable && config.icons.picker {
                 Some(&cx.editor.icons)
             } else {
                 None
