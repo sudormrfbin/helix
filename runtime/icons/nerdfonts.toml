@@ -7,7 +7,7 @@ info = {icon = ""}
 hint = {icon = ""}
 
 [symbol-kind]
-file = {icon = ""}
+file = {icon = ""}
 module = {icon = ""}
 namespace = {icon = ""}
 package = {icon = ""}
