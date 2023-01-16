@@ -233,12 +233,6 @@ pub trait FlavorLoader<T> {
                 )
             })?;
 
-            log::error!("INHERITS: {}", parent_flavor_name);
-            match self.default_data(parent_flavor_name) {
-                Some(_d) => log::error!("SOME"),
-                None => log::error!("None"),
-            }
-
             let parent_flavor_toml = match self.default_data(parent_flavor_name) {
                 Some(p) => p,
                 None => self.load_flavor(
