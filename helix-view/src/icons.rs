@@ -210,6 +210,8 @@ impl Loader {
         // Not classy, but less cumbersome than trying to pass a parameter to a deserializer.
         if !true_color {
             icons.reset_styles();
+        } else {
+            icons.set_diagnostic_icons_base_style(theme);
         }
 
         Ok(Icons {
