@@ -4,53 +4,30 @@ use crate::{
     compositor::{Callback, Component, Compositor, Context, Event, EventResult},
     ctrl, key, shift,
 };
-use tui::{buffer::Buffer as Surface, text::Spans, widgets::Table};
+use tui::{buffer::Buffer as Surface, widgets::Table};
 
 pub use tui::widgets::{Cell, Row};
 
 use fuzzy_matcher::skim::SkimMatcherV2 as Matcher;
 use fuzzy_matcher::FuzzyMatcher;
 
-use helix_view::{
-    graphics::Rect,
-    icons::{Icon, Icons},
-    Editor,
-};
+use helix_view::{graphics::Rect, Editor};
 use tui::layout::Constraint;
 
 pub trait Item {
     /// Additional editor state that is used for label calculation.
     type Data;
 
-    /// If the `icons` parameter is set to `None`, no icon will be present in the label
-    /// Returns the label and a boolean telling if an icon has been found for the label or not
-    fn label<'a>(&self, data: &Self::Data, icons: Option<&'a Icons>) -> (Spans, bool) {
-        let icon_span = icons.and_then(|icons| self.icon(icons));
-        let mut spans = self.label_text(data);
-        if let Some(icon_span) = icon_span {
-            spans.0.insert(0, icon_span.into());
-        }
-        (spans, icon_span.is_some())
-    }
-
-    fn label_text(&self, data: &Self::Data) -> Spans;
+    fn format(&self, data: &Self::Data) -> Row;
 
     fn sort_text(&self, data: &Self::Data) -> Cow<str> {
-        let label: String = self.label(data, None).0.into();
+        let label: String = self.format(data).cell_text().collect();
         label.into()
     }
 
     fn filter_text(&self, data: &Self::Data) -> Cow<str> {
-        let label: String = self.label(data, None).0.into();
+        let label: String = self.format(data).cell_text().collect();
         label.into()
-    }
-
-    fn row(&self, data: &Self::Data) -> Row {
-        Row::new(vec![Cell::from(self.label(data, None).0)])
-    }
-
-    fn icon<'a>(&self, _icons: &'a Icons) -> Option<&'a Icon> {
-        None
     }
 }
 
@@ -58,17 +35,11 @@ impl Item for PathBuf {
     /// Root prefix to strip.
     type Data = PathBuf;
 
-    fn label_text<'a>(&self, root_path: &Self::Data) -> Spans {
+    fn format(&self, root_path: &Self::Data) -> Row {
         self.strip_prefix(root_path)
             .unwrap_or(self)
             .to_string_lossy()
             .into()
-    }
-
-    /// Returns the icon for a filetype.
-    /// If not was found, it falls back on the `file` symbolkind icon, if available.
-    fn icon<'a>(&self, icons: &'a Icons) -> Option<&'a Icon> {
-        icons.icon_from_path(self)
     }
 }
 
@@ -169,10 +140,10 @@ impl<T: Item> Menu<T> {
         let n = self
             .options
             .first()
-            .map(|option| option.row(&self.editor_data).cells.len())
+            .map(|option| option.format(&self.editor_data).cells.len())
             .unwrap_or_default();
         let max_lens = self.options.iter().fold(vec![0; n], |mut acc, option| {
-            let row = option.row(&self.editor_data);
+            let row = option.format(&self.editor_data);
             // maintain max for each column
             for (acc, cell) in acc.iter_mut().zip(row.cells.iter()) {
                 let width = cell.content.width();
@@ -356,7 +327,9 @@ impl<T: Item + 'static> Component for Menu<T> {
             (a + b - 1) / b
         }
 
-        let rows = options.iter().map(|option| option.row(&self.editor_data));
+        let rows = options
+            .iter()
+            .map(|option| option.format(&self.editor_data));
         let table = Table::new(rows)
             .style(style)
             .highlight_style(selected)

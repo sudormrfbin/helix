@@ -1,16 +1,18 @@
 use futures_util::FutureExt;
 use helix_lsp::{
     block_on,
-    lsp::{self, CodeAction, CodeActionOrCommand, DiagnosticSeverity, NumberOrString, SymbolKind},
+    lsp::{self, CodeAction, CodeActionOrCommand, DiagnosticSeverity, NumberOrString},
     util::{diagnostic_to_lsp_diagnostic, lsp_pos_to_pos, lsp_range_to_range, range_to_lsp_range},
     OffsetEncoding,
 };
-use tui::text::{Span, Spans};
+use tui::{
+    text::{Span, Spans},
+    widgets::Row,
+};
 
 use super::{align_view, push_jump, Align, Context, Editor, Open};
 
 use helix_core::{path, Selection};
-use helix_view::icons::Icon;
 use helix_view::{apply_transaction, document::Mode, editor::Action, theme::Style};
 
 use crate::{
@@ -47,7 +49,7 @@ impl ui::menu::Item for lsp::Location {
     /// Current working directory.
     type Data = PathBuf;
 
-    fn label_text(&self, cwdir: &Self::Data) -> Spans {
+    fn format(&self, cwdir: &Self::Data) -> Row {
         // The preallocation here will overallocate a few characters since it will account for the
         // URL's scheme, which is not used most of the time since that scheme will be "file://".
         // Those extra chars will be used to avoid allocating when writing the line number (in the
@@ -81,7 +83,7 @@ impl ui::menu::Item for lsp::SymbolInformation {
     /// Path to currently focussed document
     type Data = Option<lsp::Url>;
 
-    fn label_text(&self, current_doc_path: &Self::Data) -> Spans {
+    fn format(&self, current_doc_path: &Self::Data) -> Row {
         if current_doc_path.as_ref() == Some(&self.location.uri) {
             self.name.as_str().into()
         } else {
@@ -92,42 +94,6 @@ impl ui::menu::Item for lsp::SymbolInformation {
                 }
                 Err(_) => format!("{} ({})", &self.name, &self.location.uri).into(),
             }
-        }
-    }
-
-    fn icon<'a>(&self, icons: &'a helix_view::icons::Icons) -> Option<&'a Icon> {
-        if let Some(symbol_kind_icons) = &icons.symbol_kind {
-            match self.kind {
-                SymbolKind::FILE => symbol_kind_icons.get("file"),
-                SymbolKind::MODULE => symbol_kind_icons.get("module"),
-                SymbolKind::NAMESPACE => symbol_kind_icons.get("namespace"),
-                SymbolKind::PACKAGE => symbol_kind_icons.get("package"),
-                SymbolKind::CLASS => symbol_kind_icons.get("class"),
-                SymbolKind::METHOD => symbol_kind_icons.get("method"),
-                SymbolKind::PROPERTY => symbol_kind_icons.get("property"),
-                SymbolKind::FIELD => symbol_kind_icons.get("field"),
-                SymbolKind::CONSTRUCTOR => symbol_kind_icons.get("constructor"),
-                SymbolKind::ENUM => symbol_kind_icons.get("enumeration"),
-                SymbolKind::INTERFACE => symbol_kind_icons.get("interface"),
-                SymbolKind::FUNCTION => symbol_kind_icons.get("function"),
-                SymbolKind::VARIABLE => symbol_kind_icons.get("variable"),
-                SymbolKind::CONSTANT => symbol_kind_icons.get("constant"),
-                SymbolKind::STRING => symbol_kind_icons.get("string"),
-                SymbolKind::NUMBER => symbol_kind_icons.get("number"),
-                SymbolKind::BOOLEAN => symbol_kind_icons.get("boolean"),
-                SymbolKind::ARRAY => symbol_kind_icons.get("array"),
-                SymbolKind::OBJECT => symbol_kind_icons.get("object"),
-                SymbolKind::KEY => symbol_kind_icons.get("key"),
-                SymbolKind::NULL => symbol_kind_icons.get("null"),
-                SymbolKind::ENUM_MEMBER => symbol_kind_icons.get("enum-member"),
-                SymbolKind::STRUCT => symbol_kind_icons.get("structure"),
-                SymbolKind::EVENT => symbol_kind_icons.get("event"),
-                SymbolKind::OPERATOR => symbol_kind_icons.get("operator"),
-                SymbolKind::TYPE_PARAMETER => symbol_kind_icons.get("type-parameter"),
-                _ => None,
-            }
-        } else {
-            None
         }
     }
 }
@@ -147,7 +113,7 @@ struct PickerDiagnostic {
 impl ui::menu::Item for PickerDiagnostic {
     type Data = (DiagnosticStyles, DiagnosticsFormat);
 
-    fn label_text(&self, (styles, format): &Self::Data) -> Spans {
+    fn format(&self, (styles, format): &Self::Data) -> Row {
         let mut style = self
             .diag
             .severity
@@ -186,20 +152,7 @@ impl ui::menu::Item for PickerDiagnostic {
             Span::styled(&self.diag.message, style),
             Span::styled(code, style),
         ])
-    }
-
-    fn icon<'a>(&self, icons: &'a helix_view::icons::Icons) -> Option<&'a Icon> {
-        if let Some(severity) = self.diag.severity {
-            match severity {
-                DiagnosticSeverity::HINT => Some(&icons.diagnostic.hint),
-                DiagnosticSeverity::INFORMATION => Some(&icons.diagnostic.info),
-                DiagnosticSeverity::WARNING => Some(&icons.diagnostic.warning),
-                DiagnosticSeverity::ERROR => Some(&icons.diagnostic.error),
-                _ => None,
-            }
-        } else {
-            None
-        }
+        .into()
     }
 }
 
@@ -518,7 +471,7 @@ pub fn workspace_diagnostics_picker(cx: &mut Context) {
 
 impl ui::menu::Item for lsp::CodeActionOrCommand {
     type Data = ();
-    fn label_text(&self, _data: &Self::Data) -> Spans {
+    fn format(&self, _data: &Self::Data) -> Row {
         match self {
             lsp::CodeActionOrCommand::CodeAction(action) => action.title.as_str().into(),
             lsp::CodeActionOrCommand::Command(command) => command.title.as_str().into(),
@@ -713,7 +666,7 @@ pub fn code_action(cx: &mut Context) {
 
 impl ui::menu::Item for lsp::Command {
     type Data = ();
-    fn label_text(&self, _data: &Self::Data) -> Spans {
+    fn format(&self, _data: &Self::Data) -> Row {
         self.title.as_str().into()
     }
 }

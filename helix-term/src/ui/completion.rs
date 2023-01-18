@@ -1,7 +1,6 @@
 use crate::compositor::{Component, Context, Event, EventResult};
 use helix_view::{apply_transaction, editor::CompleteAction, ViewId};
 use tui::buffer::Buffer as Surface;
-use tui::text::Spans;
 
 use std::borrow::Cow;
 
@@ -33,11 +32,7 @@ impl menu::Item for CompletionItem {
             .into()
     }
 
-    fn label_text(&self, _data: &Self::Data) -> Spans {
-        self.label.as_str().into()
-    }
-
-    fn row(&self, _data: &Self::Data) -> menu::Row {
+    fn format(&self, _data: &Self::Data) -> menu::Row {
         menu::Row::new(vec![
             menu::Cell::from(self.label.as_str()),
             menu::Cell::from(match self.kind {
@@ -60,12 +55,12 @@ impl menu::Item for CompletionItem {
                 Some(lsp::CompletionItemKind::FILE) => "file",
                 Some(lsp::CompletionItemKind::REFERENCE) => "reference",
                 Some(lsp::CompletionItemKind::FOLDER) => "folder",
-                Some(lsp::CompletionItemKind::ENUM_MEMBER) => "enum-member",
+                Some(lsp::CompletionItemKind::ENUM_MEMBER) => "enum_member",
                 Some(lsp::CompletionItemKind::CONSTANT) => "constant",
                 Some(lsp::CompletionItemKind::STRUCT) => "struct",
                 Some(lsp::CompletionItemKind::EVENT) => "event",
                 Some(lsp::CompletionItemKind::OPERATOR) => "operator",
-                Some(lsp::CompletionItemKind::TYPE_PARAMETER) => "type-param",
+                Some(lsp::CompletionItemKind::TYPE_PARAMETER) => "type_param",
                 Some(kind) => {
                     log::error!("Received unknown completion item kind: {:?}", kind);
                     ""
