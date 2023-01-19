@@ -100,7 +100,7 @@ impl Icons {
         }
     }
 
-    /// Returns a reference to an appropriate icon for the specified file path, with a default "file" icon if none is found
+    /// Returns a reference to an appropriate icon for the specified file path, with a default "file" icon if none is found (if available, otherwise it returns `None`)
     pub fn icon_from_path<'a>(&'a self, filepath: &Path) -> Option<&'a Icon> {
         if let Some(extension_or_filename) = filepath
             .extension()

@@ -1,7 +1,7 @@
 use futures_util::FutureExt;
 use helix_lsp::{
     block_on,
-    lsp::{self, CodeAction, CodeActionOrCommand, DiagnosticSeverity, NumberOrString},
+    lsp::{self, CodeAction, CodeActionOrCommand, DiagnosticSeverity, NumberOrString, SymbolKind},
     util::{diagnostic_to_lsp_diagnostic, lsp_pos_to_pos, lsp_range_to_range, range_to_lsp_range},
     OffsetEncoding,
 };
@@ -13,7 +13,13 @@ use tui::{
 use super::{align_view, push_jump, Align, Context, Editor, Open};
 
 use helix_core::{path, Selection};
-use helix_view::{apply_transaction, document::Mode, editor::Action, icons::Icons, theme::Style};
+use helix_view::{
+    apply_transaction,
+    document::Mode,
+    editor::Action,
+    icons::{Icon, Icons},
+    theme::Style,
+};
 
 use crate::{
     compositor::{self, Compositor},
@@ -49,7 +55,7 @@ impl ui::menu::Item for lsp::Location {
     /// Current working directory.
     type Data = PathBuf;
 
-    fn format<'a>(&self, cwdir: &Self::Data, icons: Option<&'a Icons>) -> Row {
+    fn format<'a>(&self, cwdir: &Self::Data, _icons: Option<&'a Icons>) -> Row {
         // The preallocation here will overallocate a few characters since it will account for the
         // URL's scheme, which is not used most of the time since that scheme will be "file://".
         // Those extra chars will be used to avoid allocating when writing the line number (in the
@@ -84,8 +90,50 @@ impl ui::menu::Item for lsp::SymbolInformation {
     type Data = Option<lsp::Url>;
 
     fn format<'a>(&self, current_doc_path: &Self::Data, icons: Option<&'a Icons>) -> Row {
+        let icon = if let Some(icons) = icons {
+            if let Some(symbol_kind_icons) = &icons.symbol_kind {
+                match self.kind {
+                    SymbolKind::FILE => symbol_kind_icons.get("file"),
+                    SymbolKind::MODULE => symbol_kind_icons.get("module"),
+                    SymbolKind::NAMESPACE => symbol_kind_icons.get("namespace"),
+                    SymbolKind::PACKAGE => symbol_kind_icons.get("package"),
+                    SymbolKind::CLASS => symbol_kind_icons.get("class"),
+                    SymbolKind::METHOD => symbol_kind_icons.get("method"),
+                    SymbolKind::PROPERTY => symbol_kind_icons.get("property"),
+                    SymbolKind::FIELD => symbol_kind_icons.get("field"),
+                    SymbolKind::CONSTRUCTOR => symbol_kind_icons.get("constructor"),
+                    SymbolKind::ENUM => symbol_kind_icons.get("enumeration"),
+                    SymbolKind::INTERFACE => symbol_kind_icons.get("interface"),
+                    SymbolKind::FUNCTION => symbol_kind_icons.get("function"),
+                    SymbolKind::VARIABLE => symbol_kind_icons.get("variable"),
+                    SymbolKind::CONSTANT => symbol_kind_icons.get("constant"),
+                    SymbolKind::STRING => symbol_kind_icons.get("string"),
+                    SymbolKind::NUMBER => symbol_kind_icons.get("number"),
+                    SymbolKind::BOOLEAN => symbol_kind_icons.get("boolean"),
+                    SymbolKind::ARRAY => symbol_kind_icons.get("array"),
+                    SymbolKind::OBJECT => symbol_kind_icons.get("object"),
+                    SymbolKind::KEY => symbol_kind_icons.get("key"),
+                    SymbolKind::NULL => symbol_kind_icons.get("null"),
+                    SymbolKind::ENUM_MEMBER => symbol_kind_icons.get("enum-member"),
+                    SymbolKind::STRUCT => symbol_kind_icons.get("structure"),
+                    SymbolKind::EVENT => symbol_kind_icons.get("event"),
+                    SymbolKind::OPERATOR => symbol_kind_icons.get("operator"),
+                    SymbolKind::TYPE_PARAMETER => symbol_kind_icons.get("type-parameter"),
+                    _ => None,
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
         if current_doc_path.as_ref() == Some(&self.location.uri) {
-            self.name.as_str().into()
+            if let Some(icon) = icon {
+                Spans::from(vec![icon.into(), self.name.as_str().into()]).into()
+            } else {
+                self.name.as_str().into()
+            }
         } else {
             match self.location.uri.to_file_path() {
                 Ok(path) => {
@@ -114,6 +162,22 @@ impl ui::menu::Item for PickerDiagnostic {
     type Data = (DiagnosticStyles, DiagnosticsFormat);
 
     fn format<'a>(&self, (styles, format): &Self::Data, icons: Option<&'a Icons>) -> Row {
+        let icon: Option<&'a Icon> = if let Some(icons) = icons {
+            if let Some(severity) = self.diag.severity {
+                match severity {
+                    DiagnosticSeverity::ERROR => Some(&icons.diagnostic.error),
+                    DiagnosticSeverity::WARNING => Some(&icons.diagnostic.warning),
+                    DiagnosticSeverity::HINT => Some(&icons.diagnostic.hint),
+                    DiagnosticSeverity::INFORMATION => Some(&icons.diagnostic.info),
+                    _ => None,
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
         let mut style = self
             .diag
             .severity
@@ -147,12 +211,22 @@ impl ui::menu::Item for PickerDiagnostic {
             }
         };
 
-        Spans::from(vec![
-            Span::raw(path),
-            Span::styled(&self.diag.message, style),
-            Span::styled(code, style),
-        ])
-        .into()
+        if let Some(icon) = icon {
+            Spans::from(vec![
+                icon.into(),
+                Span::raw(path),
+                Span::styled(&self.diag.message, style),
+                Span::styled(code, style),
+            ])
+            .into()
+        } else {
+            Spans::from(vec![
+                Span::raw(path),
+                Span::styled(&self.diag.message, style),
+                Span::styled(code, style),
+            ])
+            .into()
+        }
     }
 }
 
@@ -482,7 +556,7 @@ pub fn workspace_diagnostics_picker(cx: &mut Context) {
 
 impl ui::menu::Item for lsp::CodeActionOrCommand {
     type Data = ();
-    fn format<'a>(&self, _data: &Self::Data, icons: Option<&'a Icons>) -> Row {
+    fn format<'a>(&self, _data: &Self::Data, _icons: Option<&'a Icons>) -> Row {
         match self {
             lsp::CodeActionOrCommand::CodeAction(action) => action.title.as_str().into(),
             lsp::CodeActionOrCommand::Command(command) => command.title.as_str().into(),
@@ -677,7 +751,7 @@ pub fn code_action(cx: &mut Context) {
 
 impl ui::menu::Item for lsp::Command {
     type Data = ();
-    fn format<'a>(&self, _data: &Self::Data, icons: Option<&'a Icons>) -> Row {
+    fn format<'a>(&self, _data: &Self::Data, _icons: Option<&'a Icons>) -> Row {
         self.title.as_str().into()
     }
 }

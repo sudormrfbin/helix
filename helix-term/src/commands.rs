@@ -5,7 +5,10 @@ pub(crate) mod typed;
 pub use dap::*;
 use helix_vcs::Hunk;
 pub use lsp::*;
-use tui::widgets::Row;
+use tui::{
+    text::{Span, Spans},
+    widgets::Row,
+};
 pub use typed::*;
 
 use helix_core::{
@@ -1867,10 +1870,19 @@ fn global_search(cx: &mut Context) {
         type Data = Option<PathBuf>;
 
         fn format<'a>(&self, current_path: &Self::Data, icons: Option<&'a Icons>) -> Row {
+            let icon = if let Some(icons) = icons {
+                if let Some(icon) = icons.icon_from_path(&self.path) {
+                    Some(icon)
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
             let relative_path = helix_core::path::get_relative_path(&self.path)
                 .to_string_lossy()
                 .into_owned();
-            if current_path
+            let path_span: Span = if current_path
                 .as_ref()
                 .map(|p| p == &self.path)
                 .unwrap_or(false)
@@ -1878,6 +1890,12 @@ fn global_search(cx: &mut Context) {
                 format!("{} (*)", relative_path).into()
             } else {
                 relative_path.into()
+            };
+
+            if let Some(icon) = icon {
+                Spans::from(vec![icon.into(), path_span.into()]).into()
+            } else {
+                path_span.into()
             }
         }
     }
@@ -2329,6 +2347,21 @@ fn buffer_picker(cx: &mut Context) {
                 None => SCRATCH_BUFFER_NAME,
             };
 
+            let icon = if let Some(icons) = icons {
+                // If there is no path, the icon will default to the common "file" icon
+                let path = match self.path.clone() {
+                    Some(p) => p,
+                    None => PathBuf::from("scratch"),
+                };
+                if let Some(icon) = icons.icon_from_path(&path) {
+                    Some(icon)
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
+
             let mut flags = Vec::new();
             if self.is_modified {
                 flags.push("+");
@@ -2342,7 +2375,13 @@ fn buffer_picker(cx: &mut Context) {
             } else {
                 format!(" ({})", flags.join(""))
             };
-            format!("{} {}{}", self.id, path, flag).into()
+
+            let path_span: Span = format!("{} {}{}", self.id, path, flag).into();
+            if let Some(icon) = icon {
+                Spans::from(vec![icon.into(), path_span]).into()
+            } else {
+                path_span.into()
+            }
         }
     }
 
@@ -2394,6 +2433,16 @@ fn jumplist_picker(cx: &mut Context) {
         type Data = ();
 
         fn format<'a>(&self, _data: &Self::Data, icons: Option<&'a Icons>) -> Row {
+            // If there is no path, the icon will default to the common "file" icon
+            let icon = if let Some(icons) = icons {
+                let path = match self.path.clone() {
+                    Some(p) => p,
+                    None => PathBuf::from("scratch"),
+                };
+                icons.icon_from_path(&path)
+            } else {
+                None
+            };
             let path = self
                 .path
                 .as_deref()
@@ -2413,7 +2462,13 @@ fn jumplist_picker(cx: &mut Context) {
             } else {
                 format!(" ({})", flags.join(""))
             };
-            format!("{} {}{} {}", self.id, path, flag, self.text).into()
+
+            let path_span: Span = format!("{} {}{} {}", self.id, path, flag, self.text).into();
+            if let Some(icon) = icon {
+                Spans::from(vec![icon.into(), path_span]).into()
+            } else {
+                path_span.into()
+            }
         }
     }
 
@@ -2471,7 +2526,7 @@ fn jumplist_picker(cx: &mut Context) {
 impl ui::menu::Item for MappableCommand {
     type Data = ReverseKeymap;
 
-    fn format<'a>(&self, keymap: &Self::Data, icons: Option<&'a Icons>) -> Row {
+    fn format<'a>(&self, keymap: &Self::Data, _icons: Option<&'a Icons>) -> Row {
         let fmt_binding = |bindings: &Vec<Vec<KeyEvent>>| -> String {
             bindings.iter().fold(String::new(), |mut acc, bind| {
                 if !acc.is_empty() {

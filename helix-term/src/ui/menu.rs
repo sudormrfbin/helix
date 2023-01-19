@@ -15,7 +15,7 @@ pub use tui::widgets::{Cell, Row};
 use fuzzy_matcher::skim::SkimMatcherV2 as Matcher;
 use fuzzy_matcher::FuzzyMatcher;
 
-use helix_view::{graphics::Rect, icons::Icons, theme::Style, Editor};
+use helix_view::{graphics::Rect, icons::Icons, Editor};
 use tui::layout::Constraint;
 
 pub trait Item {
@@ -47,16 +47,7 @@ impl Item for PathBuf {
             .to_string_lossy();
         if let Some(icons) = icons {
             if let Some(icon) = icons.icon_from_path(&self) {
-                let style = if let Some(style) = icon.style {
-                    style.into()
-                } else {
-                    Style::default()
-                };
-                row = Spans::from(vec![
-                    Span::styled(format!("{} ", icon.icon_char), style),
-                    Span::raw(path_str),
-                ])
-                .into();
+                row = Spans::from(vec![icon.into(), Span::raw(path_str)]).into();
             } else {
                 row = path_str.into();
             }

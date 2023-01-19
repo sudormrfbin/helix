@@ -32,7 +32,8 @@ impl menu::Item for CompletionItem {
             .into()
     }
 
-    fn format<'a>(&self, _data: &Self::Data, icons: Option<&'a Icons>) -> menu::Row {
+    // Before implementing icons for the `CompletionItemKind`s, something must be done to `Menu::required_size` and `Menu::recalculate_size` in order to have correct sizes even with icons.
+    fn format<'a>(&self, _data: &Self::Data, _icons: Option<&'a Icons>) -> menu::Row {
         menu::Row::new(vec![
             menu::Cell::from(self.label.as_str()),
             menu::Cell::from(match self.kind {
