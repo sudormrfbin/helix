@@ -13,7 +13,7 @@ use tui::{
 use super::{align_view, push_jump, Align, Context, Editor, Open};
 
 use helix_core::{path, Selection};
-use helix_view::{apply_transaction, document::Mode, editor::Action, theme::Style};
+use helix_view::{apply_transaction, document::Mode, editor::Action, icons::Icons, theme::Style};
 
 use crate::{
     compositor::{self, Compositor},
@@ -49,7 +49,7 @@ impl ui::menu::Item for lsp::Location {
     /// Current working directory.
     type Data = PathBuf;
 
-    fn format(&self, cwdir: &Self::Data) -> Row {
+    fn format<'a>(&self, cwdir: &Self::Data, icons: Option<&'a Icons>) -> Row {
         // The preallocation here will overallocate a few characters since it will account for the
         // URL's scheme, which is not used most of the time since that scheme will be "file://".
         // Those extra chars will be used to avoid allocating when writing the line number (in the
@@ -83,7 +83,7 @@ impl ui::menu::Item for lsp::SymbolInformation {
     /// Path to currently focussed document
     type Data = Option<lsp::Url>;
 
-    fn format(&self, current_doc_path: &Self::Data) -> Row {
+    fn format<'a>(&self, current_doc_path: &Self::Data, icons: Option<&'a Icons>) -> Row {
         if current_doc_path.as_ref() == Some(&self.location.uri) {
             self.name.as_str().into()
         } else {
@@ -113,7 +113,7 @@ struct PickerDiagnostic {
 impl ui::menu::Item for PickerDiagnostic {
     type Data = (DiagnosticStyles, DiagnosticsFormat);
 
-    fn format(&self, (styles, format): &Self::Data) -> Row {
+    fn format<'a>(&self, (styles, format): &Self::Data, icons: Option<&'a Icons>) -> Row {
         let mut style = self
             .diag
             .severity
@@ -208,11 +208,17 @@ fn sym_picker(
     symbols: Vec<lsp::SymbolInformation>,
     current_path: Option<lsp::Url>,
     offset_encoding: OffsetEncoding,
+    editor: &Editor,
 ) -> FilePicker<lsp::SymbolInformation> {
     // TODO: drop current_path comparison and instead use workspace: bool flag?
     FilePicker::new(
         symbols,
         current_path.clone(),
+        if editor.config().icons.picker {
+            Some(&editor.icons)
+        } else {
+            None
+        },
         move |cx, symbol, action| {
             let (view, doc) = current!(cx.editor);
             push_jump(view, doc);
@@ -288,6 +294,11 @@ fn diag_picker(
     FilePicker::new(
         flat_diag,
         (styles, format),
+        if cx.editor.config().icons.picker {
+            Some(&cx.editor.icons)
+        } else {
+            None
+        },
         move |cx, PickerDiagnostic { url, diag }, action| {
             if current_path.as_ref() == Some(url) {
                 let (view, doc) = current!(cx.editor);
@@ -366,7 +377,7 @@ pub fn symbol_picker(cx: &mut Context) {
                     }
                 };
 
-                let picker = sym_picker(symbols, current_url, offset_encoding);
+                let picker = sym_picker(symbols, current_url, offset_encoding, &editor);
                 compositor.push(Box::new(overlayed(picker)))
             }
         },
@@ -389,9 +400,9 @@ pub fn workspace_symbol_picker(cx: &mut Context) {
 
     cx.callback(
         future,
-        move |_editor, compositor, response: Option<Vec<lsp::SymbolInformation>>| {
+        move |editor, compositor, response: Option<Vec<lsp::SymbolInformation>>| {
             let symbols = response.unwrap_or_default();
-            let picker = sym_picker(symbols, current_url, offset_encoding);
+            let picker = sym_picker(symbols, current_url, offset_encoding, &editor);
             let get_symbols = |query: String, editor: &mut Editor| {
                 let doc = doc!(editor);
                 let language_server = match doc.language_server() {
@@ -471,7 +482,7 @@ pub fn workspace_diagnostics_picker(cx: &mut Context) {
 
 impl ui::menu::Item for lsp::CodeActionOrCommand {
     type Data = ();
-    fn format(&self, _data: &Self::Data) -> Row {
+    fn format<'a>(&self, _data: &Self::Data, icons: Option<&'a Icons>) -> Row {
         match self {
             lsp::CodeActionOrCommand::CodeAction(action) => action.title.as_str().into(),
             lsp::CodeActionOrCommand::Command(command) => command.title.as_str().into(),
@@ -666,7 +677,7 @@ pub fn code_action(cx: &mut Context) {
 
 impl ui::menu::Item for lsp::Command {
     type Data = ();
-    fn format(&self, _data: &Self::Data) -> Row {
+    fn format<'a>(&self, _data: &Self::Data, icons: Option<&'a Icons>) -> Row {
         self.title.as_str().into()
     }
 }
@@ -889,6 +900,7 @@ fn goto_impl(
             let picker = FilePicker::new(
                 locations,
                 cwdir,
+                None,
                 move |cx, location, action| {
                     jump_to_location(cx.editor, location, offset_encoding, action)
                 },

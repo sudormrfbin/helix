@@ -32,6 +32,7 @@ use helix_view::{
     clipboard::ClipboardType,
     document::{FormatterError, Mode, SCRATCH_BUFFER_NAME},
     editor::{Action, Motion},
+    icons::Icons,
     info::Info,
     input::KeyEvent,
     keyboard::KeyCode,
@@ -1865,7 +1866,7 @@ fn global_search(cx: &mut Context) {
     impl ui::menu::Item for FileResult {
         type Data = Option<PathBuf>;
 
-        fn format(&self, current_path: &Self::Data) -> Row {
+        fn format<'a>(&self, current_path: &Self::Data, icons: Option<&'a Icons>) -> Row {
             let relative_path = helix_core::path::get_relative_path(&self.path)
                 .to_string_lossy()
                 .into_owned();
@@ -1989,6 +1990,11 @@ fn global_search(cx: &mut Context) {
                 let picker = FilePicker::new(
                     all_matches,
                     current_path,
+                    if editor.config().icons.picker {
+                        Some(&editor.icons)
+                    } else {
+                        None
+                    },
                     move |cx, FileResult { path, line_num }, action| {
                         match cx.editor.open(path, action) {
                             Ok(_) => {}
@@ -2290,13 +2296,13 @@ fn file_picker(cx: &mut Context) {
     // We don't specify language markers, root will be the root of the current
     // git repo or the current dir if we're not in a repo
     let root = find_root(None, &[]);
-    let picker = ui::file_picker(root, &cx.editor.config());
+    let picker = ui::file_picker(root, &cx.editor.config(), &cx.editor);
     cx.push_layer(Box::new(overlayed(picker)));
 }
 
 fn file_picker_in_current_directory(cx: &mut Context) {
     let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("./"));
-    let picker = ui::file_picker(cwd, &cx.editor.config());
+    let picker = ui::file_picker(cwd, &cx.editor.config(), &cx.editor);
     cx.push_layer(Box::new(overlayed(picker)));
 }
 
@@ -2313,7 +2319,7 @@ fn buffer_picker(cx: &mut Context) {
     impl ui::menu::Item for BufferMeta {
         type Data = ();
 
-        fn format(&self, _data: &Self::Data) -> Row {
+        fn format<'a>(&self, _data: &Self::Data, icons: Option<&'a Icons>) -> Row {
             let path = self
                 .path
                 .as_deref()
@@ -2354,6 +2360,11 @@ fn buffer_picker(cx: &mut Context) {
             .map(|doc| new_meta(doc))
             .collect(),
         (),
+        if cx.editor.config().icons.picker {
+            Some(&cx.editor.icons)
+        } else {
+            None
+        },
         |cx, meta, action| {
             cx.editor.switch(meta.id, action);
         },
@@ -2382,7 +2393,7 @@ fn jumplist_picker(cx: &mut Context) {
     impl ui::menu::Item for JumpMeta {
         type Data = ();
 
-        fn format(&self, _data: &Self::Data) -> Row {
+        fn format<'a>(&self, _data: &Self::Data, icons: Option<&'a Icons>) -> Row {
             let path = self
                 .path
                 .as_deref()
@@ -2436,6 +2447,11 @@ fn jumplist_picker(cx: &mut Context) {
             })
             .collect(),
         (),
+        if cx.editor.config().icons.picker {
+            Some(&cx.editor.icons)
+        } else {
+            None
+        },
         |cx, meta, action| {
             cx.editor.switch(meta.id, action);
             let config = cx.editor.config();
@@ -2455,7 +2471,7 @@ fn jumplist_picker(cx: &mut Context) {
 impl ui::menu::Item for MappableCommand {
     type Data = ReverseKeymap;
 
-    fn format(&self, keymap: &Self::Data) -> Row {
+    fn format<'a>(&self, keymap: &Self::Data, icons: Option<&'a Icons>) -> Row {
         let fmt_binding = |bindings: &Vec<Vec<KeyEvent>>| -> String {
             bindings.iter().fold(String::new(), |mut acc, bind| {
                 if !acc.is_empty() {
@@ -2497,7 +2513,7 @@ pub fn command_palette(cx: &mut Context) {
                 }
             }));
 
-            let picker = Picker::new(commands, keymap, move |cx, command, _action| {
+            let picker = Picker::new(commands, keymap, None, move |cx, command, _action| {
                 let mut ctx = Context {
                     register: None,
                     count: std::num::NonZeroUsize::new(1),

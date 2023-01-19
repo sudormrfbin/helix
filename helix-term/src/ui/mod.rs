@@ -156,7 +156,11 @@ pub fn regex_prompt(
     cx.push_layer(Box::new(prompt));
 }
 
-pub fn file_picker(root: PathBuf, config: &helix_view::editor::Config) -> FilePicker<PathBuf> {
+pub fn file_picker(
+    root: PathBuf,
+    config: &helix_view::editor::Config,
+    editor: &Editor,
+) -> FilePicker<PathBuf> {
     use ignore::{types::TypesBuilder, WalkBuilder};
     use std::time::Instant;
 
@@ -221,6 +225,11 @@ pub fn file_picker(root: PathBuf, config: &helix_view::editor::Config) -> FilePi
     FilePicker::new(
         files,
         root,
+        if config.icons.picker {
+            Some(&editor.icons)
+        } else {
+            None
+        },
         move |cx, path: &PathBuf, action| {
             if let Err(e) = cx.editor.open(path, action) {
                 let err = if let Some(err) = e.source() {
