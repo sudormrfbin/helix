@@ -40,22 +40,14 @@ impl Item for PathBuf {
     type Data = PathBuf;
 
     fn format<'a>(&self, root_path: &Self::Data, icons: Option<&'a Icons>) -> Row {
-        let row: Row;
         let path_str = self
             .strip_prefix(root_path)
             .unwrap_or(self)
             .to_string_lossy();
-        if let Some(icons) = icons {
-            if let Some(icon) = icons.icon_from_path(&self) {
-                row = Spans::from(vec![icon.into(), Span::raw(path_str)]).into();
-            } else {
-                row = path_str.into();
-            }
-        } else {
-            row = path_str.into();
+        match icons.and_then(|icons| icons.icon_from_path(&self)) {
+            Some(icon) => Row::new([icon.into(), Span::raw(path_str)]),
+            None => path_str.into(),
         }
-
-        row
     }
 }
 

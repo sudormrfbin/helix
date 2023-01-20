@@ -212,7 +212,7 @@ impl<'a> From<Cow<'a, str>> for Span<'a> {
 impl<'a, 'b> From<&'b Icon> for Span<'a> {
     fn from(icon: &'b Icon) -> Self {
         Span {
-            content: format!("{} ", icon.icon_char).into(),
+            content: format!("{}", icon.icon_char).into(),
             style: icon.style.unwrap_or_default().into(),
         }
     }
@@ -468,6 +468,7 @@ impl<'a> From<&Text<'a>> for String {
             }
             output.push('\n');
         }
+        output.pop(); // remove extra newline
         output
     }
 }

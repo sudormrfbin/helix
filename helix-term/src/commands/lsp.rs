@@ -130,7 +130,7 @@ impl ui::menu::Item for lsp::SymbolInformation {
 
         if current_doc_path.as_ref() == Some(&self.location.uri) {
             if let Some(icon) = icon {
-                Spans::from(vec![icon.into(), self.name.as_str().into()]).into()
+                Row::new::<Vec<Span>>(vec![icon.into(), self.name.as_str().into()]).into()
             } else {
                 self.name.as_str().into()
             }
@@ -212,7 +212,7 @@ impl ui::menu::Item for PickerDiagnostic {
         };
 
         if let Some(icon) = icon {
-            Spans::from(vec![
+            Row::new(vec![
                 icon.into(),
                 Span::raw(path),
                 Span::styled(&self.diag.message, style),
@@ -220,7 +220,7 @@ impl ui::menu::Item for PickerDiagnostic {
             ])
             .into()
         } else {
-            Spans::from(vec![
+            Row::new(vec![
                 Span::raw(path),
                 Span::styled(&self.diag.message, style),
                 Span::styled(code, style),
