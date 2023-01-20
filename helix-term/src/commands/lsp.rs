@@ -5,10 +5,7 @@ use helix_lsp::{
     util::{diagnostic_to_lsp_diagnostic, lsp_pos_to_pos, lsp_range_to_range, range_to_lsp_range},
     OffsetEncoding,
 };
-use tui::{
-    text::{Span, Spans},
-    widgets::Row,
-};
+use tui::{text::Span, widgets::Row};
 
 use super::{align_view, push_jump, Align, Context, Editor, Open};
 
@@ -130,7 +127,7 @@ impl ui::menu::Item for lsp::SymbolInformation {
 
         if current_doc_path.as_ref() == Some(&self.location.uri) {
             if let Some(icon) = icon {
-                Row::new::<Vec<Span>>(vec![icon.into(), self.name.as_str().into()]).into()
+                Row::new::<Vec<Span>>(vec![icon.into(), self.name.as_str().into()])
             } else {
                 self.name.as_str().into()
             }
@@ -162,21 +159,16 @@ impl ui::menu::Item for PickerDiagnostic {
     type Data = (DiagnosticStyles, DiagnosticsFormat);
 
     fn format<'a>(&self, (styles, format): &Self::Data, icons: Option<&'a Icons>) -> Row {
-        let icon: Option<&'a Icon> = if let Some(icons) = icons {
-            if let Some(severity) = self.diag.severity {
-                match severity {
+        let icon: Option<&'a Icon> =
+            icons
+                .zip(self.diag.severity)
+                .and_then(|(icons, severity)| match severity {
                     DiagnosticSeverity::ERROR => Some(&icons.diagnostic.error),
                     DiagnosticSeverity::WARNING => Some(&icons.diagnostic.warning),
                     DiagnosticSeverity::HINT => Some(&icons.diagnostic.hint),
                     DiagnosticSeverity::INFORMATION => Some(&icons.diagnostic.info),
                     _ => None,
-                }
-            } else {
-                None
-            }
-        } else {
-            None
-        };
+                });
 
         let mut style = self
             .diag
@@ -218,14 +210,12 @@ impl ui::menu::Item for PickerDiagnostic {
                 Span::styled(&self.diag.message, style),
                 Span::styled(code, style),
             ])
-            .into()
         } else {
             Row::new(vec![
                 Span::raw(path),
                 Span::styled(&self.diag.message, style),
                 Span::styled(code, style),
             ])
-            .into()
         }
     }
 }
@@ -368,11 +358,7 @@ fn diag_picker(
     FilePicker::new(
         flat_diag,
         (styles, format),
-        if cx.editor.config().icons.picker {
-            Some(&cx.editor.icons)
-        } else {
-            None
-        },
+        cx.editor.config().icons.picker.then(|| &cx.editor.icons),
         move |cx, PickerDiagnostic { url, diag }, action| {
             if current_path.as_ref() == Some(url) {
                 let (view, doc) = current!(cx.editor);
@@ -451,7 +437,7 @@ pub fn symbol_picker(cx: &mut Context) {
                     }
                 };
 
-                let picker = sym_picker(symbols, current_url, offset_encoding, &editor);
+                let picker = sym_picker(symbols, current_url, offset_encoding, editor);
                 compositor.push(Box::new(overlayed(picker)))
             }
         },

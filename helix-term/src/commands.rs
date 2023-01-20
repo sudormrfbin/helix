@@ -1869,15 +1869,7 @@ fn global_search(cx: &mut Context) {
         type Data = Option<PathBuf>;
 
         fn format<'a>(&self, current_path: &Self::Data, icons: Option<&'a Icons>) -> Row {
-            let icon = if let Some(icons) = icons {
-                if let Some(icon) = icons.icon_from_path(&self.path) {
-                    Some(icon)
-                } else {
-                    None
-                }
-            } else {
-                None
-            };
+            let icon = icons.and_then(|icons| icons.icon_from_path(&self.path));
             let relative_path = helix_core::path::get_relative_path(&self.path)
                 .to_string_lossy()
                 .into_owned();
@@ -2007,11 +1999,7 @@ fn global_search(cx: &mut Context) {
                 let picker = FilePicker::new(
                     all_matches,
                     current_path,
-                    if editor.config().icons.picker {
-                        Some(&editor.icons)
-                    } else {
-                        None
-                    },
+                    editor.config().icons.picker.then(|| &editor.icons),
                     move |cx, FileResult { path, line_num }, action| {
                         match cx.editor.open(path, action) {
                             Ok(_) => {}
@@ -2346,20 +2334,18 @@ fn buffer_picker(cx: &mut Context) {
                 None => SCRATCH_BUFFER_NAME,
             };
 
-            let icon = if let Some(icons) = icons {
-                // If there is no path, the icon will default to the common "file" icon
-                let path = match self.path.clone() {
-                    Some(p) => p,
-                    None => PathBuf::from("scratch"),
-                };
-                if let Some(icon) = icons.icon_from_path(&path) {
-                    Some(icon)
-                } else {
-                    None
-                }
-            } else {
-                None
-            };
+            // Get the filetype icon, or a "file" icon for scratch buffers
+            let icon = icons.and_then(|icons| {
+                self.path
+                    .as_ref()
+                    .and_then(|path| icons.icon_from_path(&path))
+                    .or_else(|| {
+                        icons
+                            .symbol_kind
+                            .as_ref()
+                            .and_then(|symbol_kind_icons| symbol_kind_icons.get("file"))
+                    })
+            });
 
             let mut flags = Vec::new();
             if self.is_modified {
@@ -2377,7 +2363,7 @@ fn buffer_picker(cx: &mut Context) {
 
             let path_span: Span = format!("{} {}{}", self.id, path, flag).into();
             if let Some(icon) = icon {
-                Spans::from(vec![icon.into(), path_span]).into()
+                Row::new(vec![icon.into(), path_span]).into()
             } else {
                 path_span.into()
             }
@@ -2398,11 +2384,7 @@ fn buffer_picker(cx: &mut Context) {
             .map(|doc| new_meta(doc))
             .collect(),
         (),
-        if cx.editor.config().icons.picker {
-            Some(&cx.editor.icons)
-        } else {
-            None
-        },
+        cx.editor.config().icons.picker.then(|| &cx.editor.icons),
         |cx, meta, action| {
             cx.editor.switch(meta.id, action);
         },
@@ -2432,16 +2414,19 @@ fn jumplist_picker(cx: &mut Context) {
         type Data = ();
 
         fn format<'a>(&self, _data: &Self::Data, icons: Option<&'a Icons>) -> Row {
-            // If there is no path, the icon will default to the common "file" icon
-            let icon = if let Some(icons) = icons {
-                let path = match self.path.clone() {
-                    Some(p) => p,
-                    None => PathBuf::from("scratch"),
-                };
-                icons.icon_from_path(&path)
-            } else {
-                None
-            };
+            // Get the filetype icon, or a "file" icon for scratch buffers
+            let icon = icons.and_then(|icons| {
+                self.path
+                    .as_ref()
+                    .and_then(|path| icons.icon_from_path(&path))
+                    .or_else(|| {
+                        icons
+                            .symbol_kind
+                            .as_ref()
+                            .and_then(|symbol_kind_icons| symbol_kind_icons.get("file"))
+                    })
+            });
+
             let path = self
                 .path
                 .as_deref()
@@ -2464,7 +2449,7 @@ fn jumplist_picker(cx: &mut Context) {
 
             let path_span: Span = format!("{} {}{} {}", self.id, path, flag, self.text).into();
             if let Some(icon) = icon {
-                Spans::from(vec![icon.into(), path_span]).into()
+                Row::new(vec![icon.into(), path_span]).into()
             } else {
                 path_span.into()
             }
@@ -2501,11 +2486,7 @@ fn jumplist_picker(cx: &mut Context) {
             })
             .collect(),
         (),
-        if cx.editor.config().icons.picker {
-            Some(&cx.editor.icons)
-        } else {
-            None
-        },
+        cx.editor.config().icons.picker.then(|| &cx.editor.icons),
         |cx, meta, action| {
             cx.editor.switch(meta.id, action);
             let config = cx.editor.config();

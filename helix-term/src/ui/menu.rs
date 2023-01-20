@@ -4,11 +4,7 @@ use crate::{
     compositor::{Callback, Component, Compositor, Context, Event, EventResult},
     ctrl, key, shift,
 };
-use tui::{
-    buffer::Buffer as Surface,
-    text::{Span, Spans},
-    widgets::Table,
-};
+use tui::{buffer::Buffer as Surface, text::Span, widgets::Table};
 
 pub use tui::widgets::{Cell, Row};
 

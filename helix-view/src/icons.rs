@@ -102,28 +102,19 @@ impl Icons {
 
     /// Returns a reference to an appropriate icon for the specified file path, with a default "file" icon if none is found (if available, otherwise it returns `None`)
     pub fn icon_from_path<'a>(&'a self, filepath: &Path) -> Option<&'a Icon> {
-        if let Some(extension_or_filename) = filepath
+        filepath
             .extension()
             .or_else(|| filepath.file_name())
             .and_then(|e| e.to_str())
-        {
-            if let Some(mime_type_icons) = &self.mime_type {
-                match mime_type_icons.get(extension_or_filename) {
-                    Some(i) => Some(i),
-                    None => {
-                        if let Some(symbol_kind_icons) = &self.symbol_kind {
-                            symbol_kind_icons.get("file")
-                        } else {
-                            None
-                        }
-                    }
-                }
-            } else {
-                None
-            }
-        } else {
-            None
-        }
+            .zip(self.mime_type.as_ref())
+            .map(|(extension_or_filename, mime_type_icons)| {
+                mime_type_icons.get(extension_or_filename).or_else(|| {
+                    self.symbol_kind
+                        .as_ref()
+                        .and_then(|symbol_kind_icons| symbol_kind_icons.get("file"))
+                })
+            })
+            .and_then(|icon| icon)
     }
 }
 

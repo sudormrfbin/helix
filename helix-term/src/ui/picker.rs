@@ -735,11 +735,7 @@ impl<T: Item + 'static> Component for Picker<T> {
             .map(|option| {
                 option.format(
                     &self.editor_data,
-                    if cx.editor.config().icons.picker {
-                        Some(&cx.editor.icons)
-                    } else {
-                        None
-                    },
+                    cx.editor.config().icons.picker.then(|| &cx.editor.icons),
                 )
             })
             .map(|mut row| {
