@@ -1884,7 +1884,7 @@ fn global_search(cx: &mut Context) {
             };
 
             if let Some(icon) = icon {
-                Spans::from(vec![icon.into(), path_span.into()]).into()
+                Spans::from(vec![icon.into(), path_span]).into()
             } else {
                 path_span.into()
             }
@@ -2301,13 +2301,13 @@ fn file_picker(cx: &mut Context) {
     // We don't specify language markers, root will be the root of the current
     // git repo or the current dir if we're not in a repo
     let root = find_root(None, &[]);
-    let picker = ui::file_picker(root, &cx.editor.config(), &cx.editor);
+    let picker = ui::file_picker(root, &cx.editor.config(), cx.editor);
     cx.push_layer(Box::new(overlayed(picker)));
 }
 
 fn file_picker_in_current_directory(cx: &mut Context) {
     let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("./"));
-    let picker = ui::file_picker(cwd, &cx.editor.config(), &cx.editor);
+    let picker = ui::file_picker(cwd, &cx.editor.config(), cx.editor);
     cx.push_layer(Box::new(overlayed(picker)));
 }
 
@@ -2338,7 +2338,7 @@ fn buffer_picker(cx: &mut Context) {
             let icon = icons.and_then(|icons| {
                 self.path
                     .as_ref()
-                    .and_then(|path| icons.icon_from_path(&path))
+                    .and_then(|path| icons.icon_from_path(path))
                     .or_else(|| {
                         icons
                             .symbol_kind
@@ -2363,7 +2363,7 @@ fn buffer_picker(cx: &mut Context) {
 
             let path_span: Span = format!("{} {}{}", self.id, path, flag).into();
             if let Some(icon) = icon {
-                Row::new(vec![icon.into(), path_span]).into()
+                Row::new(vec![icon.into(), path_span])
             } else {
                 path_span.into()
             }
@@ -2418,7 +2418,7 @@ fn jumplist_picker(cx: &mut Context) {
             let icon = icons.and_then(|icons| {
                 self.path
                     .as_ref()
-                    .and_then(|path| icons.icon_from_path(&path))
+                    .and_then(|path| icons.icon_from_path(path))
                     .or_else(|| {
                         icons
                             .symbol_kind
@@ -2449,7 +2449,7 @@ fn jumplist_picker(cx: &mut Context) {
 
             let path_span: Span = format!("{} {}{} {}", self.id, path, flag, self.text).into();
             if let Some(icon) = icon {
-                Row::new(vec![icon.into(), path_span]).into()
+                Row::new(vec![icon.into(), path_span])
             } else {
                 path_span.into()
             }

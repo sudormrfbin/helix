@@ -72,7 +72,7 @@ fn open(cx: &mut compositor::Context, args: &[Cow<str>], event: PromptEvent) -> 
             let callback = async move {
                 let call: job::Callback = job::Callback::EditorCompositor(Box::new(
                     move |editor: &mut Editor, compositor: &mut Compositor| {
-                        let picker = ui::file_picker(path, &editor.config(), &editor);
+                        let picker = ui::file_picker(path, &editor.config(), editor);
                         compositor.push(Box::new(overlayed(picker)));
                     },
                 ));

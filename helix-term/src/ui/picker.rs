@@ -398,10 +398,10 @@ pub struct Picker<T: Item> {
 }
 
 impl<T: Item> Picker<T> {
-    pub fn new<'a>(
+    pub fn new(
         options: Vec<T>,
         editor_data: T::Data,
-        icons: Option<&'a Icons>,
+        icons: Option<&'_ Icons>,
         callback_fn: impl Fn(&mut Context, &T, Action) + 'static,
     ) -> Self {
         let prompt = Prompt::new(

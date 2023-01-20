@@ -462,7 +462,7 @@ pub fn workspace_symbol_picker(cx: &mut Context) {
         future,
         move |editor, compositor, response: Option<Vec<lsp::SymbolInformation>>| {
             let symbols = response.unwrap_or_default();
-            let picker = sym_picker(symbols, current_url, offset_encoding, &editor);
+            let picker = sym_picker(symbols, current_url, offset_encoding, editor);
             let get_symbols = |query: String, editor: &mut Editor| {
                 let doc = doc!(editor);
                 let language_server = match doc.language_server() {
