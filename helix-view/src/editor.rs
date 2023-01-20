@@ -122,9 +122,11 @@ pub struct IconsConfig {
     /// Globally enables or disables icons. Defaults to `false`.
     pub enable: bool,
     /// Enables icons in front of buffer names in bufferline. Defaults to `true`
-    pub bufferline: bool,
+    bufferline: bool,
     /// Enables icons in front of items in the picker. Defaults to `true`
-    pub picker: bool,
+    picker: bool,
+    /// Enables icons in front of items in the statusline. Defaults to `true`
+    statusline: bool,
 }
 
 impl Default for IconsConfig {
@@ -133,7 +135,25 @@ impl Default for IconsConfig {
             enable: false,
             bufferline: true,
             picker: true,
+            statusline: true,
         }
+    }
+}
+
+impl IconsConfig {
+    /// Check both global icons' configuration and individual bufferline configuration
+    pub fn bufferline(&self) -> bool {
+        self.enable && self.bufferline
+    }
+
+    /// Check both global icons' configuration and individual picker configuration
+    pub fn picker(&self) -> bool {
+        self.enable && self.picker
+    }
+
+    /// Check both global icons' configuration and individual statusline configuration
+    pub fn statusline(&self) -> bool {
+        self.enable && self.statusline
     }
 }
 

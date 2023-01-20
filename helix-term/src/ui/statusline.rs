@@ -22,6 +22,7 @@ pub struct RenderContext<'a> {
     pub spinners: &'a ProgressSpinners,
     pub parts: RenderBuffer<'a>,
     pub filetype_icon: Option<&'a Icon>,
+    pub icons_enabled: bool,
 }
 
 impl<'a> RenderContext<'a> {
@@ -62,6 +63,7 @@ impl<'a> RenderContext<'a> {
             spinners,
             parts: RenderBuffer::default(),
             filetype_icon,
+            icons_enabled: editor.config().icons.statusline(),
         }
     }
 }
@@ -449,12 +451,14 @@ fn render_file_type_icon<F>(context: &mut RenderContext, write: F)
 where
     F: Fn(&mut RenderContext, String, Option<Style>) + Copy,
 {
-    if let Some(icon) = context.filetype_icon {
-        write(
-            context,
-            format!("{}", icon.icon_char),
-            icon.style.map(|icons_style| icons_style.into()),
-        )
+    if context.icons_enabled {
+        if let Some(icon) = context.filetype_icon {
+            write(
+                context,
+                format!("{}", icon.icon_char),
+                icon.style.map(|icons_style| icons_style.into()),
+            )
+        }
     }
 }
 

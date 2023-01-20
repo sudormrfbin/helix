@@ -225,7 +225,7 @@ pub fn file_picker(
     FilePicker::new(
         files,
         root,
-        if config.icons.picker {
+        if config.icons.picker() {
             Some(&editor.icons)
         } else {
             None

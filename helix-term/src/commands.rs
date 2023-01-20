@@ -1999,7 +1999,7 @@ fn global_search(cx: &mut Context) {
                 let picker = FilePicker::new(
                     all_matches,
                     current_path,
-                    editor.config().icons.picker.then(|| &editor.icons),
+                    editor.config().icons.picker().then(|| &editor.icons),
                     move |cx, FileResult { path, line_num }, action| {
                         match cx.editor.open(path, action) {
                             Ok(_) => {}
@@ -2384,7 +2384,7 @@ fn buffer_picker(cx: &mut Context) {
             .map(|doc| new_meta(doc))
             .collect(),
         (),
-        cx.editor.config().icons.picker.then(|| &cx.editor.icons),
+        cx.editor.config().icons.picker().then(|| &cx.editor.icons),
         |cx, meta, action| {
             cx.editor.switch(meta.id, action);
         },
@@ -2486,7 +2486,7 @@ fn jumplist_picker(cx: &mut Context) {
             })
             .collect(),
         (),
-        cx.editor.config().icons.picker.then(|| &cx.editor.icons),
+        cx.editor.config().icons.picker().then(|| &cx.editor.icons),
         |cx, meta, action| {
             cx.editor.switch(meta.id, action);
             let config = cx.editor.config();
