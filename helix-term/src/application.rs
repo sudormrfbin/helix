@@ -202,6 +202,9 @@ impl Application {
         let editor_view = Box::new(ui::EditorView::new(Keymaps::new(keys)));
         compositor.push(editor_view);
 
+        editor.set_theme(theme);
+        editor.set_icons(icons);
+
         if args.load_tutor {
             let path = helix_loader::runtime_dir().join("tutor");
             editor.open(&path, Action::VerticalSplit)?;
@@ -268,9 +271,6 @@ impl Application {
                 .new_file_from_stdin(Action::VerticalSplit)
                 .unwrap_or_else(|_| editor.new_file(Action::VerticalSplit));
         }
-
-        editor.set_theme(theme);
-        editor.set_icons(icons);
 
         #[cfg(windows)]
         let signals = futures_util::stream::empty();
