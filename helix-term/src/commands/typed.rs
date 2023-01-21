@@ -823,9 +823,6 @@ fn icons(
                 .icons_loader
                 .load(flavor_name, &cx.editor.theme, true_color)
                 .with_context(|| "Icons flavor does not exist")?;
-            // if !(true_color || theme.is_16_color()) {
-            //     bail!("Unsupported theme: theme requires true color support");
-            // }
             cx.editor.set_icons(icons);
         } else {
             let name = cx.editor.icons.name().to_string();

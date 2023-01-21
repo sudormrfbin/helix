@@ -79,7 +79,6 @@ pub fn diagnostic<'doc>(
                 Some(Severity::Info) => &editor.icons.diagnostic.info,
                 Some(Severity::Hint) => &editor.icons.diagnostic.hint,
             };
-            // write!(out, "●").unwrap();
             write!(out, "{}", diagnostic_icon.icon_char).unwrap();
             return Some(match diagnostic.severity {
                 Some(Severity::Error) => error,

@@ -281,10 +281,6 @@ impl FlavorLoader<Icons> for Loader {
     }
 
     fn default_data(&self, name: &str) -> Option<Value> {
-        if name == "default" {
-            Some(DEFAULT_ICONS.clone())
-        } else {
-            None
-        }
+        (name == "default").then(|| DEFAULT_ICONS.clone())
     }
 }

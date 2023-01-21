@@ -49,10 +49,9 @@ impl<'a> RenderContext<'a> {
         }
         // Otherwise based on filetype
         if filetype_icon.is_none() {
-            filetype_icon = match doc.path() {
-                Some(path) => editor.icons.icon_from_path(path),
-                None => None,
-            };
+            filetype_icon = doc
+                .path()
+                .and_then(|path| editor.icons.icon_from_path(&path));
         }
 
         RenderContext {

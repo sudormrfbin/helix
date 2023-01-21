@@ -697,10 +697,9 @@ impl EditorView {
 
         for doc in editor.documents() {
             // Determine icon based on filetype if possible
-            let mut filetype_icon = match doc.path() {
-                Some(path) => editor.icons.icon_from_path(path),
-                None => None,
-            };
+            let mut filetype_icon = doc
+                .path()
+                .and_then(|path| editor.icons.icon_from_path(path));
             // Otherwise based on language name
             if filetype_icon.is_none() {
                 if let Some(language_config) = doc.language_config() {

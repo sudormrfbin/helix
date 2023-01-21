@@ -167,7 +167,7 @@ impl ui::menu::Item for PickerDiagnostic {
                     DiagnosticSeverity::WARNING => Some(&icons.diagnostic.warning),
                     DiagnosticSeverity::HINT => Some(&icons.diagnostic.hint),
                     DiagnosticSeverity::INFORMATION => Some(&icons.diagnostic.info),
-                    _ => None,
+                    _ => Some(&icons::BLANK_ICON),
                 });
 
         let mut style = self
