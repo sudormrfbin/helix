@@ -162,12 +162,12 @@ impl ui::menu::Item for PickerDiagnostic {
         let icon: Option<&'a Icon> =
             icons
                 .zip(self.diag.severity)
-                .and_then(|(icons, severity)| match severity {
-                    DiagnosticSeverity::ERROR => Some(&icons.diagnostic.error),
-                    DiagnosticSeverity::WARNING => Some(&icons.diagnostic.warning),
-                    DiagnosticSeverity::HINT => Some(&icons.diagnostic.hint),
-                    DiagnosticSeverity::INFORMATION => Some(&icons.diagnostic.info),
-                    _ => Some(&icons::BLANK_ICON),
+                .map(|(icons, severity)| match severity {
+                    DiagnosticSeverity::ERROR => &icons.diagnostic.error,
+                    DiagnosticSeverity::WARNING => &icons.diagnostic.warning,
+                    DiagnosticSeverity::HINT => &icons.diagnostic.hint,
+                    DiagnosticSeverity::INFORMATION => &icons.diagnostic.info,
+                    _ => &icons::BLANK_ICON,
                 });
 
         let mut style = self

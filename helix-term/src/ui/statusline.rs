@@ -51,7 +51,7 @@ impl<'a> RenderContext<'a> {
         if filetype_icon.is_none() {
             filetype_icon = doc
                 .path()
-                .and_then(|path| editor.icons.icon_from_path(&path));
+                .and_then(|path| editor.icons.icon_from_path(path));
         }
 
         RenderContext {
