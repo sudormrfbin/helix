@@ -278,11 +278,7 @@ fn sym_picker(
     FilePicker::new(
         symbols,
         current_path.clone(),
-        if editor.config().icons.picker() {
-            Some(&editor.icons)
-        } else {
-            None
-        },
+        editor.config().icons.picker().then(|| &editor.icons),
         move |cx, symbol, action| {
             let (view, doc) = current!(cx.editor);
             push_jump(view, doc);
