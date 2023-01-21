@@ -8,6 +8,11 @@ use toml::Value;
 use crate::graphics::{Color, Style};
 use crate::Theme;
 
+pub static BLANK_ICON: Icon = Icon {
+    icon_char: ' ',
+    style: None,
+};
+
 /// The style of an icon can either be defined by the TOML file, or by the theme.
 /// We need to remember that in order to reload the icons colors when the theme changes.
 #[derive(Debug, Clone, Copy, PartialEq)]

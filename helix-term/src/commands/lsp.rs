@@ -14,7 +14,7 @@ use helix_view::{
     apply_transaction,
     document::Mode,
     editor::Action,
-    icons::{Icon, Icons},
+    icons::{self, Icon, Icons},
     theme::Style,
 };
 
@@ -87,9 +87,10 @@ impl ui::menu::Item for lsp::SymbolInformation {
     type Data = Option<lsp::Url>;
 
     fn format<'a>(&self, current_doc_path: &Self::Data, icons: Option<&'a Icons>) -> Row {
-        let icon = if let Some(icons) = icons {
-            if let Some(symbol_kind_icons) = &icons.symbol_kind {
-                match self.kind {
+        let icon =
+            icons
+                .and_then(|icons| icons.symbol_kind.as_ref())
+                .and_then(|symbol_kind_icons| match self.kind {
                     SymbolKind::FILE => symbol_kind_icons.get("file"),
                     SymbolKind::MODULE => symbol_kind_icons.get("module"),
                     SymbolKind::NAMESPACE => symbol_kind_icons.get("namespace"),
@@ -116,14 +117,8 @@ impl ui::menu::Item for lsp::SymbolInformation {
                     SymbolKind::EVENT => symbol_kind_icons.get("event"),
                     SymbolKind::OPERATOR => symbol_kind_icons.get("operator"),
                     SymbolKind::TYPE_PARAMETER => symbol_kind_icons.get("type-parameter"),
-                    _ => None,
-                }
-            } else {
-                None
-            }
-        } else {
-            None
-        };
+                    _ => Some(&icons::BLANK_ICON),
+                });
 
         if current_doc_path.as_ref() == Some(&self.location.uri) {
             if let Some(icon) = icon {
@@ -132,12 +127,17 @@ impl ui::menu::Item for lsp::SymbolInformation {
                 self.name.as_str().into()
             }
         } else {
-            match self.location.uri.to_file_path() {
+            let symbol_span: Span = match self.location.uri.to_file_path() {
                 Ok(path) => {
                     let get_relative_path = path::get_relative_path(path.as_path());
                     format!("{} ({})", &self.name, get_relative_path.to_string_lossy()).into()
                 }
                 Err(_) => format!("{} ({})", &self.name, &self.location.uri).into(),
+            };
+            if let Some(icon) = icon {
+                Row::new::<Vec<Span>>(vec![icon.into(), symbol_span])
+            } else {
+                Row::from(symbol_span)
             }
         }
     }
