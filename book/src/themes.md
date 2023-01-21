@@ -8,6 +8,8 @@ Create a file with the name of your theme as file name (i.e `mytheme.toml`) and 
 
 The names "default" and "base16_default" are reserved for the builtin themes and cannot be overridden by user defined themes.
 
+The name of the theme must be set using the `name` key.
+
 The default theme.toml can be found [here](https://github.com/helix-editor/helix/blob/master/theme.toml), and user submitted themes [here](https://github.com/helix-editor/helix/blob/master/runtime/themes). 
 
 Each line in the theme file is specified as below:
@@ -270,7 +272,7 @@ These scopes are used for theming the editor interface.
 | `ui.statusline.insert`      | Statusline mode during insert mode ([only if `editor.color-modes` is enabled][editor-section]) |
 | `ui.statusline.select`      | Statusline mode during select mode ([only if `editor.color-modes` is enabled][editor-section]) |
 | `ui.statusline.separator`   | Separator character in statusline                                                              |
-| `ui.popup`                  | Documentation popups (e.g Space + k)                                                             |
+| `ui.popup`                  | Documentation popups (e.g Space + k)                                                           |
 | `ui.popup.info`             | Prompt for multiple key options                                                                |
 | `ui.window`                 | Border lines separating splits                                                                 |
 | `ui.help`                   | Description box for commands                                                                   |
@@ -279,7 +281,7 @@ These scopes are used for theming the editor interface.
 | `ui.text.inactive`          | Same as `ui.text` but when the text is inactive (e.g. suggestions)                             |
 | `ui.text.info`              | The key: command text in `ui.popup.info` boxes                                                 |
 | `ui.virtual.ruler`          | Ruler columns (see the [`editor.rulers` config][editor-section])                               |
-| `ui.virtual.whitespace`     | Visible whitespace characters                                                                 |
+| `ui.virtual.whitespace`     | Visible whitespace characters                                                                  |
 | `ui.virtual.indent-guide`   | Vertical indent width guides                                                                   |
 | `ui.menu`                   | Code and command completion menus                                                              |
 | `ui.menu.selected`          | Selected autocomplete item                                                                     |
@@ -290,10 +292,10 @@ These scopes are used for theming the editor interface.
 | `ui.cursorline.secondary`   | The lines of any other cursors ([if cursorline is enabled][editor-section])                    |
 | `ui.cursorcolumn.primary`   | The column of the primary cursor ([if cursorcolumn is enabled][editor-section])                |
 | `ui.cursorcolumn.secondary` | The columns of any other cursors ([if cursorcolumn is enabled][editor-section])                |
-| `warning`                   | Diagnostics warning (gutter)                                                                   |
-| `error`                     | Diagnostics error (gutter)                                                                     |
-| `info`                      | Diagnostics info (gutter)                                                                      |
-| `hint`                      | Diagnostics hint (gutter)                                                                      |
+| `warning`                   | Diagnostics warning icon                                                                       |
+| `error`                     | Diagnostics error icon                                                                         |
+| `info`                      | Diagnostics info icon                                                                          |
+| `hint`                      | Diagnostics hint icon                                                                          |
 | `diagnostic`                | Diagnostics fallback style (editing area)                                                      |
 | `diagnostic.hint`           | Diagnostics hint (editing area)                                                                |
 | `diagnostic.info`           | Diagnostics info (editing area)                                                                |

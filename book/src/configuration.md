@@ -102,6 +102,7 @@ The following statusline elements can be configured:
 | `file-line-ending` | The file line endings (CRLF or LF) |
 | `total-line-numbers` | The total line numbers of the opened file |
 | `file-type` | The type of the opened file |
+| `file-type-icon` | The icon representing the language of the open file, or else its file type (see `[editor.icons]` section) |
 | `diagnostics` | The number of warnings and/or errors |
 | `workspace-diagnostics` | The number of warnings and/or errors on workspace |
 | `selections` | The number of active selections |
@@ -256,3 +257,16 @@ render = true
 character = "╎" # Some characters that work well: "▏", "┆", "┊", "⸽"
 skip-levels = 1
 ```
+
+### `[editor.icons]` Section
+
+Option for displaying icons within the editor.
+
+> Warning: File-type and symbol-kind icons require a patched font such as [NerdFonts](https://www.nerdfonts.com/) to be installed and configured in your terminal emulator.
+
+| Key                 | Description                                                  | Default |
+| ---                 | ---                                                          | ---     |
+| `enable`            | Whether icons are globally enabled.                          | `false` |
+| `picker`            | Whether icons in pickers are enabled.                        | `true`  |
+| `bufferline`        | Whether icons in the buffer line are enabled.                | `true`  |
+| `statusline`        | Whether icons in the status line are enabled.                | `true`  |
