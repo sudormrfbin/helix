@@ -6,6 +6,10 @@ warning = {icon = ""}
 info = {icon = ""}
 hint = {icon = ""}
 
+[breakpoint]
+verified = {icon = "▲"}
+unverified = {icon = "⊚"} 
+
 [symbol-kind]
 file = {icon = ""}
 module = {icon = ""}

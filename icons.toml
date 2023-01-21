@@ -7,3 +7,7 @@ error = {icon = "●"}
 warning = {icon = "●"}
 info = {icon = "●"}
 hint = {icon = "●"}
+
+[breakpoint]
+verified = {icon = "▲"}
+unverified = {icon = "⊚"} 

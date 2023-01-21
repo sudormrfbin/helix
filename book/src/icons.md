@@ -21,6 +21,7 @@ The default icons.toml can be found [here](https://github.com/helix-editor/helix
 Icons flavors have three sections:
 
 - Diagnostics
+- Breakpoints
 - Symbol kinds
 - Mime types
 
@@ -34,7 +35,7 @@ where `key` represents what you want to style, `icon` specifies the character to
 
 ### Diagnostic icons
 
-This section defines four required diagnostic icons:
+The `[diagnostic]` section defines four required diagnostic icons:
 
 - `error`
 - `warning`
@@ -46,9 +47,18 @@ By default, these icons have the foreground color defined in the current theme's
 
 > An icon flavor TOML file must define all of these icons.
 
+### Breakpoint icons
+
+The `[breakpoint]` section defines two required breakpoint icons:
+
+- `verified`
+- `unverified`
+
+> An icon flavor TOML file must define all of these icons.
+
 ### Symbol kinds icons
 
-This section defines the icons for the following required LSP-defined symbol kinds:
+The `[symbol-kind]` section defines the icons for the following required LSP-defined symbol kinds:
 
 - `file` (this icon is also used on files for which the mime type has not been defined in the next section, as a "generic file" icon)
 - `module`
@@ -81,7 +91,7 @@ This section defines the icons for the following required LSP-defined symbol kin
 
 ### Mime types icons
 
-This section defines optional icons for mime types or filename, such as:
+The `[mime-type]` section defines optional icons for mime types or filename, such as:
 
 ```toml
 [mime-type]
