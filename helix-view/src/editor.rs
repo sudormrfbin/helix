@@ -983,6 +983,7 @@ impl Editor {
                 self.last_theme = None;
                 // Reload the icons to apply default colors based on theme
                 self.icons.set_diagnostic_icons_base_style(&theme);
+                self.icons.set_symbolkind_icons_base_style(&theme);
                 self.theme = theme;
             }
         }

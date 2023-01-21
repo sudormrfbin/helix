@@ -80,6 +80,18 @@ impl Icons {
             .with_default_style(theme.get("warning"));
     }
 
+    /// Set theme defined styles to symbol-kind icons
+    pub fn set_symbolkind_icons_base_style(&mut self, theme: &Theme) {
+        let style = theme
+            .try_get("symbolkind")
+            .unwrap_or_else(|| theme.get("keyword"));
+        if let Some(symbol_kind_icons) = &mut self.symbol_kind {
+            for (_, icon) in symbol_kind_icons.iter_mut() {
+                icon.with_default_style(style);
+            }
+        }
+    }
+
     /// Set the default style for all icons
     pub fn reset_styles(&mut self) {
         if let Some(mime_type_icons) = &mut self.mime_type {
@@ -216,6 +228,7 @@ impl Loader {
             icons.reset_styles();
         } else {
             icons.set_diagnostic_icons_base_style(theme);
+            icons.set_symbolkind_icons_base_style(theme);
         }
 
         Ok(Icons {
@@ -236,6 +249,7 @@ impl Loader {
     pub fn default(&self, theme: &Theme) -> Icons {
         let mut icons = DEFAULT_ICONS_DATA.clone();
         icons.set_diagnostic_icons_base_style(theme);
+        icons.set_symbolkind_icons_base_style(theme);
         icons
     }
 }

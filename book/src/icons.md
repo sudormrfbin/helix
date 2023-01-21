@@ -87,6 +87,8 @@ The `[symbol-kind]` section defines the icons for the following required LSP-def
 - `operator`
 - `type-parameter`
 
+By default, these icons have the same style as the loaded theme's `keyword` key. Their style can be customized using the `symbolkind` key in the theme configuration file.
+
 > An icon flavor TOML file must define either none or all of these icons.
 
 ### Mime types icons
