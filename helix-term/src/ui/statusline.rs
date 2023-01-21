@@ -34,7 +34,7 @@ impl<'a> RenderContext<'a> {
         spinners: &'a ProgressSpinners,
     ) -> Self {
         // Determine icon based on language name if possible
-        let mut filetype_icon: Option<&'a Icon> = None;
+        let mut filetype_icon = None;
         if let Some(language_config) = doc.language_config() {
             for filetype in &language_config.file_types {
                 let filetype_str = match filetype {
