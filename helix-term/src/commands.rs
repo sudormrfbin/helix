@@ -29,7 +29,6 @@ use helix_core::{
     SmallVec, Tendril, Transaction,
 };
 use helix_view::{
-    apply_transaction,
     clipboard::ClipboardType,
     document::{FormatterError, Mode, SCRATCH_BUFFER_NAME},
     editor::{Action, Motion},
@@ -868,7 +867,7 @@ fn align_selections(cx: &mut Context) {
     changes.sort_unstable_by_key(|(from, _, _)| *from);
 
     let transaction = Transaction::change(doc.text(), changes.into_iter());
-    apply_transaction(&transaction, doc, view);
+    doc.apply(&transaction, view.id);
 }
 
 fn goto_window(cx: &mut Context, align: Align) {
@@ -1320,7 +1319,7 @@ fn replace(cx: &mut Context) {
                 }
             });
 
-            apply_transaction(&transaction, doc, view);
+            doc.apply(&transaction, view.id);
             exit_select_mode(cx);
         }
     })
@@ -1338,7 +1337,7 @@ where
         (range.from(), range.to(), Some(text))
     });
 
-    apply_transaction(&transaction, doc, view);
+    doc.apply(&transaction, view.id);
 }
 
 fn switch_case(cx: &mut Context) {
@@ -2171,7 +2170,7 @@ fn delete_selection_impl(cx: &mut Context, op: Operation) {
     let transaction = Transaction::change_by_selection(doc.text(), selection, |range| {
         (range.from(), range.to(), None)
     });
-    apply_transaction(&transaction, doc, view);
+    doc.apply(&transaction, view.id);
 
     match op {
         Operation::Delete => {
@@ -2189,7 +2188,7 @@ fn delete_selection_insert_mode(doc: &mut Document, view: &mut View, selection: 
     let transaction = Transaction::change_by_selection(doc.text(), selection, |range| {
         (range.from(), range.to(), None)
     });
-    apply_transaction(&transaction, doc, view);
+    doc.apply(&transaction, view.id);
 }
 
 fn delete_selection(cx: &mut Context) {
@@ -2285,7 +2284,7 @@ fn append_mode(cx: &mut Context) {
             doc.text(),
             [(end, end, Some(doc.line_ending.as_str().into()))].into_iter(),
         );
-        apply_transaction(&transaction, doc, view);
+        doc.apply(&transaction, view.id);
     }
 
     let selection = doc.selection(view.id).clone().transform(|range| {
@@ -2635,7 +2634,7 @@ async fn make_format_callback(
 
         if let Ok(format) = format {
             if doc.version() == doc_version {
-                apply_transaction(&format, doc, view);
+                doc.apply(&format, view.id);
                 doc.append_changes_to_history(view);
                 doc.detect_indent_and_line_ending();
                 view.ensure_cursor_in_view(doc, scrolloff);
@@ -2728,7 +2727,7 @@ fn open(cx: &mut Context, open: Open) {
 
     transaction = transaction.with_selection(Selection::new(ranges, selection.primary_index()));
 
-    apply_transaction(&transaction, doc, view);
+    doc.apply(&transaction, view.id);
 }
 
 // o inserts a new line after each line with a selection
@@ -3156,7 +3155,7 @@ pub mod insert {
 
         let (view, doc) = current!(cx.editor);
         if let Some(t) = transaction {
-            apply_transaction(&t, doc, view);
+            doc.apply(&t, view.id);
         }
 
         // TODO: need a post insert hook too for certain triggers (autocomplete, signature help, etc)
@@ -3178,7 +3177,7 @@ pub mod insert {
             &doc.selection(view.id).clone().cursors(doc.text().slice(..)),
             indent,
         );
-        apply_transaction(&transaction, doc, view);
+        doc.apply(&transaction, view.id);
     }
 
     pub fn insert_newline(cx: &mut Context) {
@@ -3283,7 +3282,7 @@ pub mod insert {
         transaction = transaction.with_selection(Selection::new(ranges, selection.primary_index()));
 
         let (view, doc) = current!(cx.editor);
-        apply_transaction(&transaction, doc, view);
+        doc.apply(&transaction, view.id);
     }
 
     pub fn delete_char_backward(cx: &mut Context) {
@@ -3378,7 +3377,7 @@ pub mod insert {
                 }
             });
         let (view, doc) = current!(cx.editor);
-        apply_transaction(&transaction, doc, view);
+        doc.apply(&transaction, view.id);
 
         lsp::signature_help_impl(cx, SignatureHelpInvoked::Automatic);
     }
@@ -3396,7 +3395,7 @@ pub mod insert {
                     None,
                 )
             });
-        apply_transaction(&transaction, doc, view);
+        doc.apply(&transaction, view.id);
 
         lsp::signature_help_impl(cx, SignatureHelpInvoked::Automatic);
     }
@@ -3677,7 +3676,7 @@ fn paste_impl(
         transaction = transaction.with_selection(Selection::new(ranges, selection.primary_index()));
     }
 
-    apply_transaction(&transaction, doc, view);
+    doc.apply(&transaction, view.id);
 }
 
 pub(crate) fn paste_bracketed_value(cx: &mut Context, contents: String) {
@@ -3769,7 +3768,7 @@ fn replace_with_yanked(cx: &mut Context) {
                 }
             });
 
-            apply_transaction(&transaction, doc, view);
+            doc.apply(&transaction, view.id);
             exit_select_mode(cx);
         }
     }
@@ -3793,7 +3792,7 @@ fn replace_selections_with_clipboard_impl(
                 )
             });
 
-            apply_transaction(&transaction, doc, view);
+            doc.apply(&transaction, view.id);
             doc.append_changes_to_history(view);
         }
         Err(e) => return Err(e.context("Couldn't get system clipboard contents")),
@@ -3865,7 +3864,7 @@ fn indent(cx: &mut Context) {
             Some((pos, pos, Some(indent.clone())))
         }),
     );
-    apply_transaction(&transaction, doc, view);
+    doc.apply(&transaction, view.id);
 }
 
 fn unindent(cx: &mut Context) {
@@ -3904,7 +3903,7 @@ fn unindent(cx: &mut Context) {
 
     let transaction = Transaction::change(doc.text(), changes.into_iter());
 
-    apply_transaction(&transaction, doc, view);
+    doc.apply(&transaction, view.id);
 }
 
 fn format_selections(cx: &mut Context) {
@@ -3959,7 +3958,7 @@ fn format_selections(cx: &mut Context) {
         language_server.offset_encoding(),
     );
 
-    apply_transaction(&transaction, doc, view);
+    doc.apply(&transaction, view.id);
 }
 
 fn join_selections_impl(cx: &mut Context, select_space: bool) {
@@ -4018,7 +4017,7 @@ fn join_selections_impl(cx: &mut Context, select_space: bool) {
         Transaction::change(doc.text(), changes.into_iter())
     };
 
-    apply_transaction(&transaction, doc, view);
+    doc.apply(&transaction, view.id);
 }
 
 fn keep_or_remove_selections_impl(cx: &mut Context, remove: bool) {
@@ -4161,7 +4160,7 @@ fn toggle_comments(cx: &mut Context) {
         .map(|tc| tc.as_ref());
     let transaction = comment::toggle_line_comments(doc.text(), doc.selection(view.id), token);
 
-    apply_transaction(&transaction, doc, view);
+    doc.apply(&transaction, view.id);
     exit_select_mode(cx);
 }
 
@@ -4217,7 +4216,7 @@ fn rotate_selection_contents(cx: &mut Context, direction: Direction) {
             .map(|(range, fragment)| (range.from(), range.to(), Some(fragment))),
     );
 
-    apply_transaction(&transaction, doc, view);
+    doc.apply(&transaction, view.id);
 }
 
 fn rotate_selection_contents_forward(cx: &mut Context) {
@@ -4750,7 +4749,7 @@ fn surround_add(cx: &mut Context) {
 
         let transaction = Transaction::change(doc.text(), changes.into_iter())
             .with_selection(Selection::new(ranges, selection.primary_index()));
-        apply_transaction(&transaction, doc, view);
+        doc.apply(&transaction, view.id);
         exit_select_mode(cx);
     })
 }
@@ -4790,7 +4789,7 @@ fn surround_replace(cx: &mut Context) {
                     (pos, pos + 1, Some(t))
                 }),
             );
-            apply_transaction(&transaction, doc, view);
+            doc.apply(&transaction, view.id);
             exit_select_mode(cx);
         });
     })
@@ -4818,7 +4817,7 @@ fn surround_delete(cx: &mut Context) {
 
         let transaction =
             Transaction::change(doc.text(), change_pos.into_iter().map(|p| (p, p + 1, None)));
-        apply_transaction(&transaction, doc, view);
+        doc.apply(&transaction, view.id);
         exit_select_mode(cx);
     })
 }
@@ -5033,7 +5032,7 @@ fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
     if behavior != &ShellBehavior::Ignore {
         let transaction = Transaction::change(doc.text(), changes.into_iter())
             .with_selection(Selection::new(ranges, selection.primary_index()));
-        apply_transaction(&transaction, doc, view);
+        doc.apply(&transaction, view.id);
         doc.append_changes_to_history(view);
     }
 
@@ -5096,7 +5095,7 @@ fn add_newline_impl(cx: &mut Context, open: Open) {
     });
 
     let transaction = Transaction::change(text, changes);
-    apply_transaction(&transaction, doc, view);
+    doc.apply(&transaction, view.id);
 }
 
 enum IncrementDirection {
@@ -5163,7 +5162,7 @@ fn increment_impl(cx: &mut Context, increment_direction: IncrementDirection) {
         let new_selection = Selection::new(new_selection_ranges, selection.primary_index());
         let transaction = Transaction::change(doc.text(), changes.into_iter());
         let transaction = transaction.with_selection(new_selection);
-        apply_transaction(&transaction, doc, view);
+        doc.apply(&transaction, view.id);
     }
 }
 

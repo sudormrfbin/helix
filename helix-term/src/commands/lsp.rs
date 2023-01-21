@@ -11,7 +11,6 @@ use super::{align_view, push_jump, Align, Context, Editor, Open};
 
 use helix_core::{path, Selection};
 use helix_view::{
-    apply_transaction,
     document::Mode,
     editor::Action,
     icons::{self, Icon, Icons},
@@ -867,7 +866,7 @@ pub fn apply_workspace_edit(
             offset_encoding,
         );
         let view = view_mut!(editor, view_id);
-        apply_transaction(&transaction, doc, view);
+        doc.apply(&transaction, view.id);
         doc.append_changes_to_history(view);
     };
 
