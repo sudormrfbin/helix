@@ -1,10 +1,10 @@
 name = "nerdfonts"
 
 [diagnostic]
-error = {icon = ""}
-warning = {icon = ""}
-info = {icon = ""}
-hint = {icon = ""}
+error = {icon = ""}
+warning = {icon = ""}
+info = {icon = ""}
+hint = {icon = ""}
 
 [breakpoint]
 verified = {icon = "▲"}
