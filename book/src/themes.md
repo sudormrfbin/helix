@@ -301,6 +301,7 @@ These scopes are used for theming the editor interface.
 | `diagnostic.info`           | Diagnostics info (editing area)                                                                |
 | `diagnostic.warning`        | Diagnostics warning (editing area)                                                             |
 | `diagnostic.error`          | Diagnostics error (editing area)                                                               |
+| `symbolkind`                | Symbol kind icons (symbol picker)                                                              |
 
 You can check compliance to spec with
 
