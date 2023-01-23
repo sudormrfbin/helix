@@ -63,6 +63,7 @@ pub struct Icons {
     pub diagnostic: Diagnostic,
     pub symbol_kind: Option<HashMap<String, Icon>>,
     pub breakpoint: Breakpoint,
+    pub diff: Diff,
 }
 
 impl Icons {
@@ -150,6 +151,14 @@ pub struct Diagnostic {
 pub struct Breakpoint {
     pub verified: Icon,
     pub unverified: Icon,
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "kebab-case", deny_unknown_fields)]
+pub struct Diff {
+    pub added: Icon,
+    pub deleted: Icon,
+    pub modified: Icon,
 }
 
 fn icon_color_to_style<'de, D>(deserializer: D) -> Result<Option<IconStyle>, D::Error>

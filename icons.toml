@@ -11,3 +11,8 @@ hint = {icon = "●"}
 [breakpoint]
 verified = {icon = "▲"}
 unverified = {icon = "⊚"} 
+
+[diff]
+added = {icon = "▍"}
+deleted = {icon = "▔"}
+modified = {icon = "▍"}

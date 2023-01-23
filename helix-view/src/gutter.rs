@@ -92,19 +92,20 @@ pub fn diagnostic<'doc>(
 }
 
 pub fn diff<'doc>(
-    _editor: &'doc Editor,
+    editor: &'doc Editor,
     doc: &'doc Document,
     _view: &View,
     theme: &Theme,
     _is_focused: bool,
 ) -> GutterFn<'doc> {
-    let added = theme.get("diff.plus");
-    let deleted = theme.get("diff.minus");
-    let modified = theme.get("diff.delta");
     if let Some(diff_handle) = doc.diff_handle() {
+        let added = theme.get("diff.plus");
+        let deleted = theme.get("diff.minus");
+        let modified = theme.get("diff.delta");
         let hunks = diff_handle.hunks();
         let mut hunk_i = 0;
         let mut hunk = hunks.nth_hunk(hunk_i);
+        let icons = &editor.icons;
         Box::new(move |line: usize, _selected: bool, out: &mut String| {
             // truncating the line is fine here because we don't compute diffs
             // for files with more lines than i32::MAX anyways
@@ -122,16 +123,16 @@ pub fn diff<'doc>(
                 return None;
             }
 
-            let (icon, style) = if hunk.is_pure_insertion() {
-                ("▍", added)
+            let (icon, default_style) = if hunk.is_pure_insertion() {
+                (&icons.diff.added, added)
             } else if hunk.is_pure_removal() {
-                ("▔", deleted)
+                (&icons.diff.deleted, deleted)
             } else {
-                ("▍", modified)
+                (&icons.diff.modified, modified)
             };
 
-            write!(out, "{}", icon).unwrap();
-            Some(style)
+            write!(out, "{}", icon.icon_char).unwrap();
+            icon.style.map(|i| i.into()).or(Some(default_style))
         })
     } else {
         Box::new(move |_, _, _| None)

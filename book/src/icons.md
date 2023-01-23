@@ -18,10 +18,11 @@ The name of the icon flavor must be set using the `name` key.
 
 The default icons.toml can be found [here](https://github.com/helix-editor/helix/blob/master/icons.toml), and user submitted icon flavors [here](https://github.com/helix-editor/helix/blob/master/runtime/icons). 
 
-Icons flavors have three sections:
+Icons flavors have five sections:
 
 - Diagnostics
 - Breakpoints
+- Diff
 - Symbol kinds
 - Mime types
 
@@ -35,7 +36,7 @@ where `key` represents what you want to style, `icon` specifies the character to
 
 ### Diagnostic icons
 
-The `[diagnostic]` section defines four required diagnostic icons:
+The `[diagnostic]` section defines four **required** diagnostic icons:
 
 - `error`
 - `warning`
@@ -43,22 +44,37 @@ The `[diagnostic]` section defines four required diagnostic icons:
 - `hint`
 
 These icons appear in the gutter, in the diagnostic pickers as well as in the status line diagnostic component.
-By default, these icons have the foreground color defined in the current theme's corresponding keys.
+By default, they have the foreground color defined in the current theme's corresponding keys.
+
+> An icon flavor TOML file must define all of these icons.
+
+### Diff icons
+
+The `[diff]` section defines three **required** diffing icons:
+
+- `added`
+- `deleted`
+- `modified`
+
+These icons appear in the gutter.
+By default, they have the foreground color defined in the current theme's corresponding keys.
 
 > An icon flavor TOML file must define all of these icons.
 
 ### Breakpoint icons
 
-The `[breakpoint]` section defines two required breakpoint icons:
+The `[breakpoint]` section defines two **required** breakpoint icons:
 
 - `verified`
 - `unverified`
+
+These icons appear in the gutter while using the Debug Adapter Protocol (DAP). Their color depends on the breakpoint's condition and log message, it cannot be overridden by the `color` key.
 
 > An icon flavor TOML file must define all of these icons.
 
 ### Symbol kinds icons
 
-The `[symbol-kind]` section defines the icons for the following required LSP-defined symbol kinds:
+The `[symbol-kind]` section defines **optional** icons for the following required LSP-defined symbol kinds:
 
 - `file` (this icon is also used on files for which the mime type has not been defined in the next section, as a "generic file" icon)
 - `module`
@@ -87,13 +103,13 @@ The `[symbol-kind]` section defines the icons for the following required LSP-def
 - `operator`
 - `type-parameter`
 
-By default, these icons have the same style as the loaded theme's `keyword` key. Their style can be customized using the `symbolkind` key in the theme configuration file.
+By default, these icons have the same style as the loaded theme's `keyword` key. Their style can be customized using the `symbolkind` key in the theme configuration file, or it can individually be overridden by their `color` key.
 
 > An icon flavor TOML file must define either none or all of these icons.
 
 ### Mime types icons
 
-The `[mime-type]` section defines optional icons for mime types or filename, such as:
+The `[mime-type]` section defines **optional** icons for mime types or filename, such as:
 
 ```toml
 [mime-type]
@@ -101,6 +117,8 @@ The `[mime-type]` section defines optional icons for mime types or filename, suc
 "LICENSE" = { icon = "…", color = "#…" }
 "rs" = { icon = "…", color = "#…" }
 ```
+
+These icons appear in the file picker, in the statusline `file-type-icon` component, and in the bufferline (when enabled).
 
 > An icon flavor TOML file can define none, some or all of these icons.
 

@@ -10,6 +10,11 @@ hint = {icon = ""}
 verified = {icon = "▲"}
 unverified = {icon = "⊚"} 
 
+[diff]
+added = {icon = "▍"}
+deleted = {icon = "▔"}
+modified = {icon = "▍"}
+
 [symbol-kind]
 file = {icon = ""}
 module = {icon = ""}
