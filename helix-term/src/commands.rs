@@ -2338,12 +2338,7 @@ fn buffer_picker(cx: &mut Context) {
                 self.path
                     .as_ref()
                     .and_then(|path| icons.icon_from_path(path))
-                    .or_else(|| {
-                        icons
-                            .symbol_kind
-                            .as_ref()
-                            .and_then(|symbol_kind_icons| symbol_kind_icons.get("file"))
-                    })
+                    .or_else(|| icons.symbol_kind.as_ref()?.get("file"))
             });
 
             let mut flags = Vec::new();
