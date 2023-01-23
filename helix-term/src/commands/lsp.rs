@@ -121,7 +121,7 @@ impl ui::menu::Item for lsp::SymbolInformation {
 
         if current_doc_path.as_ref() == Some(&self.location.uri) {
             if let Some(icon) = icon {
-                Row::new::<Vec<Span>>(vec![icon.into(), self.name.as_str().into()])
+                Row::new([Span::from(icon), self.name.as_str().into()])
             } else {
                 self.name.as_str().into()
             }
