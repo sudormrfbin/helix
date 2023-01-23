@@ -134,7 +134,7 @@ impl ui::menu::Item for lsp::SymbolInformation {
                 Err(_) => format!("{} ({})", &self.name, &self.location.uri).into(),
             };
             if let Some(icon) = icon {
-                Row::new::<Vec<Span>>(vec![icon.into(), symbol_span])
+                Row::new([Span::from(icon), symbol_span])
             } else {
                 Row::from(symbol_span)
             }
