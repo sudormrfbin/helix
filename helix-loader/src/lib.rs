@@ -203,9 +203,9 @@ pub trait FlavorLoader<T> {
 
     /// Loads the flavor data as `toml::Value` first from the `user_dir` then in `default_dir`
     fn load_toml(&self, path: PathBuf) -> Result<Value> {
-        let data = std::fs::read(&path)?;
+        let data = std::fs::read_to_string(&path)?;
 
-        toml::from_slice(data.as_slice()).context("Failed to deserialize flavor")
+        toml::from_str(&data).context("Failed to deserialize flavor")
     }
 
     /// Merge one theme into the parent theme
@@ -279,6 +279,8 @@ pub fn read_loadable_toml_names(path: &Path) -> Vec<String> {
 
 #[cfg(test)]
 mod merge_toml_tests {
+    use std::str;
+
     use super::merge_toml_values;
     use toml::Value;
 
@@ -291,8 +293,9 @@ mod merge_toml_tests {
         indent = { tab-width = 4, unit = "    ", test = "aaa" }
         "#;
 
-        let base: Value = toml::from_slice(include_bytes!("../../languages.toml"))
-            .expect("Couldn't parse built-in languages config");
+        let base = include_bytes!("../../languages.toml");
+        let base = str::from_utf8(base).expect("Couldn't parse built-in languages config");
+        let base: Value = toml::from_str(base).expect("Couldn't parse built-in languages config");
         let user: Value = toml::from_str(USER).unwrap();
 
         let merged = merge_toml_values(base, user, 3);
@@ -324,8 +327,9 @@ mod merge_toml_tests {
         language-server = { command = "deno", args = ["lsp"] }
         "#;
 
-        let base: Value = toml::from_slice(include_bytes!("../../languages.toml"))
-            .expect("Couldn't parse built-in languages config");
+        let base = include_bytes!("../../languages.toml");
+        let base = str::from_utf8(base).expect("Couldn't parse built-in languages config");
+        let base: Value = toml::from_str(base).expect("Couldn't parse built-in languages config");
         let user: Value = toml::from_str(USER).unwrap();
 
         let merged = merge_toml_values(base, user, 3);
