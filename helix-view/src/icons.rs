@@ -2,7 +2,10 @@ use helix_loader::{merge_toml_values, read_loadable_toml_names, FlavorLoader};
 use once_cell::sync::Lazy;
 use serde::Deserialize;
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::{
+    path::{Path, PathBuf},
+    str,
+};
 use toml::Value;
 
 use crate::graphics::{Color, Style};
@@ -203,7 +206,8 @@ pub struct Loader {
 }
 
 pub static DEFAULT_ICONS: Lazy<Value> = Lazy::new(|| {
-    toml::from_slice(include_bytes!("../../icons.toml")).expect("Failed to parse default icons")
+    let bytes = include_bytes!("../../icons.toml");
+    toml::from_str(str::from_utf8(bytes).unwrap()).expect("Failed to parse default icons")
 });
 
 pub static DEFAULT_ICONS_DATA: Lazy<Icons> = Lazy::new(|| Icons {
