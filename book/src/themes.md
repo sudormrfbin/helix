@@ -8,8 +8,6 @@ Create a file with the name of your theme as file name (i.e `mytheme.toml`) and 
 
 The names "default" and "base16_default" are reserved for the builtin themes and cannot be overridden by user defined themes.
 
-The name of the theme must be set using the `name` key.
-
 The default theme.toml can be found [here](https://github.com/helix-editor/helix/blob/master/theme.toml), and user submitted themes [here](https://github.com/helix-editor/helix/blob/master/runtime/themes). 
 
 Each line in the theme file is specified as below:
