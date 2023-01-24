@@ -1868,7 +1868,7 @@ fn global_search(cx: &mut Context) {
         type Data = Option<PathBuf>;
 
         fn format<'a>(&self, current_path: &Self::Data, icons: Option<&'a Icons>) -> Row {
-            let icon = icons.and_then(|icons| icons.icon_from_path(&self.path));
+            let icon = icons.and_then(|icons| icons.icon_from_path(Some(&self.path)));
             let relative_path = helix_core::path::get_relative_path(&self.path)
                 .to_string_lossy()
                 .into_owned();
@@ -2334,12 +2334,7 @@ fn buffer_picker(cx: &mut Context) {
             };
 
             // Get the filetype icon, or a "file" icon for scratch buffers
-            let icon = icons.and_then(|icons| {
-                self.path
-                    .as_ref()
-                    .and_then(|path| icons.icon_from_path(path))
-                    .or_else(|| icons.symbol_kind.as_ref()?.get("file"))
-            });
+            let icon = icons.and_then(|icons| icons.icon_from_path(self.path.as_ref()));
 
             let mut flags = Vec::new();
             if self.is_modified {
@@ -2409,17 +2404,7 @@ fn jumplist_picker(cx: &mut Context) {
 
         fn format<'a>(&self, _data: &Self::Data, icons: Option<&'a Icons>) -> Row {
             // Get the filetype icon, or a "file" icon for scratch buffers
-            let icon = icons.and_then(|icons| {
-                self.path
-                    .as_ref()
-                    .and_then(|path| icons.icon_from_path(path))
-                    .or_else(|| {
-                        icons
-                            .symbol_kind
-                            .as_ref()
-                            .and_then(|symbol_kind_icons| symbol_kind_icons.get("file"))
-                    })
-            });
+            let icon = icons.and_then(|icons| icons.icon_from_path(self.path.as_ref()));
 
             let path = self
                 .path

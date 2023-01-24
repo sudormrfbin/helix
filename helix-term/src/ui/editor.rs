@@ -711,9 +711,7 @@ impl EditorView {
             }
             // Otherwise based on filetype
             if filetype_icon.is_none() {
-                filetype_icon = doc
-                    .path()
-                    .and_then(|path| editor.icons.icon_from_path(path));
+                filetype_icon = editor.icons.icon_from_path(doc.path());
             }
 
             let fname = doc

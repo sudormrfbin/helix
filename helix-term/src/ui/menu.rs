@@ -40,7 +40,7 @@ impl Item for PathBuf {
             .strip_prefix(root_path)
             .unwrap_or(self)
             .to_string_lossy();
-        match icons.and_then(|icons| icons.icon_from_path(self)) {
+        match icons.and_then(|icons| icons.icon_from_path(Some(self))) {
             Some(icon) => Row::new([icon.into(), Span::raw(path_str)]),
             None => path_str.into(),
         }
