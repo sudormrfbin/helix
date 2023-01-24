@@ -1,4 +1,5 @@
 use helix_loader::{merge_toml_values, read_loadable_toml_names, FlavorLoader};
+use log::warn;
 use once_cell::sync::Lazy;
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -170,10 +171,10 @@ fn icon_color_to_style<'de, D>(deserializer: D) -> Result<Option<IconStyle>, D::
 where
     D: serde::Deserializer<'de>,
 {
-    let s: &str = Deserialize::deserialize(deserializer)?;
+    let s: String = Deserialize::deserialize(deserializer)?;
     let mut style = Style::default();
     if !s.is_empty() {
-        match hex_string_to_rgb(s) {
+        match hex_string_to_rgb(&s) {
             Ok(c) => {
                 style = style.fg(c);
             }
@@ -271,19 +272,20 @@ impl Loader {
 
 impl From<Value> for Icons {
     fn from(value: Value) -> Self {
-        // Delete the `inherits` value to prevent cyclic loading
-        let toml_str = value
-            .to_string()
-            .lines()
-            .filter(|line| !line.contains("inherits"))
-            .collect::<Vec<&str>>()
-            .join("\n");
-        match toml::from_str(&toml_str) {
-            Ok(icons) => icons,
-            Err(e) => {
-                log::error!("Failed to load icons, falling back to default: {}\n", e);
-                DEFAULT_ICONS_DATA.clone()
+        if let Value::Table(mut table) = value {
+            // remove inherits from value to prevent errors
+            table.remove("inherits");
+            let toml_str = table.to_string();
+            match toml::from_str(&toml_str) {
+                Ok(icons) => icons,
+                Err(e) => {
+                    log::error!("Failed to load icons, falling back to default: {}\n", e);
+                    DEFAULT_ICONS_DATA.clone()
+                }
             }
+        } else {
+            warn!("Expected icons TOML value to be a table, found {:?}", value);
+            DEFAULT_ICONS_DATA.clone()
         }
     }
 }
