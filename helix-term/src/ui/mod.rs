@@ -19,6 +19,7 @@ use crate::filter_picker_entry;
 use crate::job::{self, Callback};
 pub use completion::Completion;
 pub use editor::EditorView;
+use helix_view::icons::Icons;
 pub use markdown::Markdown;
 pub use menu::Menu;
 pub use picker::{DynamicPicker, FileLocation, FilePicker, Picker};
@@ -161,7 +162,7 @@ pub fn regex_prompt(
 pub fn file_picker(
     root: PathBuf,
     config: &helix_view::editor::Config,
-    editor: &Editor,
+    icons: &Icons,
 ) -> FilePicker<PathBuf> {
     use ignore::{types::TypesBuilder, WalkBuilder};
     use std::time::Instant;
@@ -224,7 +225,7 @@ pub fn file_picker(
     FilePicker::new(
         files,
         root,
-        config.icons.picker().then(|| &editor.icons),
+        config.icons.picker().then(|| icons),
         move |cx, path: &PathBuf, action| {
             if let Err(e) = cx.editor.open(path, action) {
                 let err = if let Some(err) = e.source() {

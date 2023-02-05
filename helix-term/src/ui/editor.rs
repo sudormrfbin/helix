@@ -559,7 +559,7 @@ impl EditorView {
                             helix_core::syntax::FileType::Extension(s) => s,
                             helix_core::syntax::FileType::Suffix(s) => s,
                         })
-                        .find_map(|filetype| editor.icons.icon_from_filetype(&filetype))
+                        .find_map(|filetype| editor.icons.icon_from_filetype(filetype))
                 })
                 .or_else(|| editor.icons.icon_from_path(doc.path()));
 
