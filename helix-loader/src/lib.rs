@@ -263,18 +263,21 @@ pub trait FlavorLoader<T> {
 
 /// Get the names of the TOML documents within a directory
 pub fn toml_names_in_dir(path: &Path) -> Vec<String> {
-    std::fs::read_dir(path)
-        .map(|entries| {
-            entries
-                .filter_map(|entry| {
-                    let entry = entry.ok()?;
-                    let path = entry.path();
-                    (path.extension()? == "toml")
-                        .then(|| path.file_stem().unwrap().to_string_lossy().into_owned())
-                })
-                .collect()
+    let entries = match std::fs::read_dir(path) {
+        Ok(entries) => entries,
+        Err(_) => return Vec::new(),
+    };
+    entries
+        .filter_map(|entry| {
+            entry
+                .ok()?
+                .file_name()
+                .to_str()?
+                .strip_suffix(".toml")
+                .filter(|name| !name.is_empty())
+                .map(ToString::to_string)
         })
-        .unwrap_or_default()
+        .collect()
 }
 
 #[cfg(test)]
