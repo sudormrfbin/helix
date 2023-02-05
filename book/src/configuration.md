@@ -317,7 +317,7 @@ Currently unused
 
 Option for displaying icons within the editor.
 
-> Warning: File-type and symbol-kind icons require a patched font such as [NerdFonts](https://www.nerdfonts.com/) to be installed and configured in your terminal emulator.
+> Warning: some symbols (such as file-type and symbol-kind icons that you would see in the picker) are not available in the "default" icon set. They usually require a patched font such as [NerdFonts](https://www.nerdfonts.com/) to be installed and configured in your terminal emulator, and the corresponding icon set to be configured in the editor (for example, using `icons = "nerdfonts"` in your configuration file).
 
 | Key                 | Description                                                  | Default |
 | ---                 | ---                                                          | ---     |
