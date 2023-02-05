@@ -546,7 +546,7 @@ impl EditorView {
         let mut x = viewport.x;
         let current_doc = view!(editor).doc;
         let config = editor.config();
-        let icons_enabled = config.icons.bufferline();
+        let icons_enabled = config.icons.bufferline;
 
         for doc in editor.documents() {
             let filetype_icon = doc

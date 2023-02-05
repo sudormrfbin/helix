@@ -277,7 +277,7 @@ fn sym_picker(
     FilePicker::new(
         symbols,
         current_path.clone(),
-        editor.config().icons.picker().then(|| &editor.icons),
+        editor.config().icons.picker.then(|| &editor.icons),
         move |cx, symbol, action| {
             let (view, doc) = current!(cx.editor);
             push_jump(view, doc);
@@ -353,7 +353,7 @@ fn diag_picker(
     FilePicker::new(
         flat_diag,
         (styles, format),
-        cx.editor.config().icons.picker().then(|| &cx.editor.icons),
+        cx.editor.config().icons.picker.then(|| &cx.editor.icons),
         move |cx, PickerDiagnostic { url, diag }, action| {
             if current_path.as_ref() == Some(url) {
                 let (view, doc) = current!(cx.editor);

@@ -225,7 +225,7 @@ pub fn file_picker(
     FilePicker::new(
         files,
         root,
-        config.icons.picker().then(|| icons),
+        config.icons.picker.then(|| icons),
         move |cx, path: &PathBuf, action| {
             if let Err(e) = cx.editor.open(path, action) {
                 let err = if let Some(err) = e.source() {

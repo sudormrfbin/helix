@@ -60,7 +60,7 @@ impl<'a> RenderContext<'a> {
             spinners,
             parts: RenderBuffer::default(),
             filetype_icon,
-            icons_enabled: editor.config().icons.statusline(),
+            icons_enabled: editor.config().icons.statusline,
         }
     }
 }

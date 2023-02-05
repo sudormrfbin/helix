@@ -214,41 +214,21 @@ impl Default for FilePickerConfig {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case", default, deny_unknown_fields)]
 pub struct IconsConfig {
-    /// Globally enables or disables icons. Defaults to `false`.
-    pub enable: bool,
     /// Enables icons in front of buffer names in bufferline. Defaults to `true`
-    bufferline: bool,
+    pub bufferline: bool,
     /// Enables icons in front of items in the picker. Defaults to `true`
-    picker: bool,
+    pub picker: bool,
     /// Enables icons in front of items in the statusline. Defaults to `true`
-    statusline: bool,
+    pub statusline: bool,
 }
 
 impl Default for IconsConfig {
     fn default() -> Self {
         Self {
-            enable: false,
             bufferline: true,
             picker: true,
             statusline: true,
         }
-    }
-}
-
-impl IconsConfig {
-    /// Check both global icons' configuration and individual bufferline configuration
-    pub fn bufferline(&self) -> bool {
-        self.enable && self.bufferline
-    }
-
-    /// Check both global icons' configuration and individual picker configuration
-    pub fn picker(&self) -> bool {
-        self.enable && self.picker
-    }
-
-    /// Check both global icons' configuration and individual statusline configuration
-    pub fn statusline(&self) -> bool {
-        self.enable && self.statusline
     }
 }
 

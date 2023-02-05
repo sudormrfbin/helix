@@ -321,7 +321,6 @@ Option for displaying icons within the editor.
 
 | Key                 | Description                                                  | Default |
 | ---                 | ---                                                          | ---     |
-| `enable`            | Whether icons are globally enabled.                          | `false` |
 | `picker`            | Whether icons in pickers are enabled.                        | `true`  |
 | `bufferline`        | Whether icons in the buffer line are enabled.                | `true`  |
 | `statusline`        | Whether icons in the status line are enabled.                | `true`  |
