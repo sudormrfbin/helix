@@ -252,8 +252,8 @@ pub trait FlavorLoader<T> {
 
     /// Lists all flavor names available in default and user directory
     fn names(&self) -> Vec<String> {
-        let mut names = read_loadable_toml_names(self.user_dir());
-        names.extend(read_loadable_toml_names(self.default_dir()));
+        let mut names = toml_names_in_dir(self.user_dir());
+        names.extend(toml_names_in_dir(self.default_dir()));
         names
     }
 
@@ -262,7 +262,7 @@ pub trait FlavorLoader<T> {
 }
 
 /// Get the names of the TOML documents within a directory
-pub fn read_loadable_toml_names(path: &Path) -> Vec<String> {
+pub fn toml_names_in_dir(path: &Path) -> Vec<String> {
     std::fs::read_dir(path)
         .map(|entries| {
             entries

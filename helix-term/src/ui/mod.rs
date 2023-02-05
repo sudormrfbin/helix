@@ -244,7 +244,7 @@ pub mod completers {
     use crate::ui::prompt::Completion;
     use fuzzy_matcher::skim::SkimMatcherV2 as Matcher;
     use fuzzy_matcher::FuzzyMatcher;
-    use helix_loader::read_loadable_toml_names;
+    use helix_loader::toml_names_in_dir;
     use helix_view::document::SCRATCH_BUFFER_NAME;
     use helix_view::{editor::Config, Editor};
     use once_cell::sync::Lazy;
@@ -286,8 +286,8 @@ pub mod completers {
     }
 
     pub fn theme(_editor: &Editor, input: &str) -> Vec<Completion> {
-        let mut names = read_loadable_toml_names(&helix_loader::runtime_dir().join("themes"));
-        names.extend(read_loadable_toml_names(
+        let mut names = toml_names_in_dir(&helix_loader::runtime_dir().join("themes"));
+        names.extend(toml_names_in_dir(
             &helix_loader::config_dir().join("themes"),
         ));
         names.push("default".into());
@@ -318,10 +318,8 @@ pub mod completers {
     }
 
     pub fn icons(_editor: &Editor, input: &str) -> Vec<Completion> {
-        let mut names = read_loadable_toml_names(&helix_loader::runtime_dir().join("icons"));
-        names.extend(read_loadable_toml_names(
-            &helix_loader::config_dir().join("icons"),
-        ));
+        let mut names = toml_names_in_dir(&helix_loader::runtime_dir().join("icons"));
+        names.extend(toml_names_in_dir(&helix_loader::config_dir().join("icons")));
         names.push("default".into());
         names.sort();
         names.dedup();

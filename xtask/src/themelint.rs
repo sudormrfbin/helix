@@ -1,6 +1,6 @@
 use crate::path;
 use crate::DynError;
-use helix_loader::read_loadable_toml_names;
+use helix_loader::toml_names_in_dir;
 use helix_view::theme::Modifier;
 use helix_view::Theme;
 
@@ -178,7 +178,7 @@ pub fn lint(file: String) -> Result<(), DynError> {
 }
 
 pub fn lint_all() -> Result<(), DynError> {
-    let files = read_loadable_toml_names(path::themes().as_path());
+    let files = toml_names_in_dir(path::themes().as_path());
     let files_count = files.len();
     let ok_files_count = files
         .into_iter()

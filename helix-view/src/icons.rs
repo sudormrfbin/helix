@@ -1,4 +1,4 @@
-use helix_loader::{merge_toml_values, read_loadable_toml_names, FlavorLoader};
+use helix_loader::{merge_toml_values, toml_names_in_dir, FlavorLoader};
 use log::warn;
 use once_cell::sync::Lazy;
 use serde::Deserialize;
@@ -255,8 +255,8 @@ impl Loader {
 
     /// Lists all icons flavors names available in default and user directory
     pub fn names(&self) -> Vec<String> {
-        let mut names = read_loadable_toml_names(&self.user_dir);
-        names.extend(read_loadable_toml_names(&self.default_dir));
+        let mut names = toml_names_in_dir(&self.user_dir);
+        names.extend(toml_names_in_dir(&self.default_dir));
         names
     }
 
