@@ -250,6 +250,7 @@ pub mod completers {
     use once_cell::sync::Lazy;
     use std::borrow::Cow;
     use std::cmp::Reverse;
+    use std::path::PathBuf;
 
     pub type Completer = fn(&Editor, &str) -> Vec<Completion>;
 
@@ -285,65 +286,60 @@ pub mod completers {
         names
     }
 
+    fn toml_filenames(dirs: &[PathBuf], additional_names: &[&str], input: &str) -> Vec<Completion> {
+        {
+            let mut names = Vec::<String>::new();
+            dirs.iter()
+                .for_each(|dir| names.extend(toml_names_in_dir(dir)));
+            additional_names
+                .iter()
+                .for_each(|name| names.push(name.to_string()));
+            names.sort();
+            names.dedup();
+
+            let mut names: Vec<_> = names
+                .into_iter()
+                .map(|name| ((0..), Cow::from(name)))
+                .collect();
+
+            let matcher = Matcher::default();
+
+            let mut matches: Vec<_> = names
+                .into_iter()
+                .filter_map(|(_range, name)| {
+                    matcher.fuzzy_match(&name, input).map(|score| (name, score))
+                })
+                .collect();
+
+            matches.sort_unstable_by(|(name1, score1), (name2, score2)| {
+                (Reverse(*score1), name1).cmp(&(Reverse(*score2), name2))
+            });
+            names = matches.into_iter().map(|(name, _)| ((0..), name)).collect();
+
+            names
+        }
+    }
+
     pub fn theme(_editor: &Editor, input: &str) -> Vec<Completion> {
-        let mut names = toml_names_in_dir(&helix_loader::runtime_dir().join("themes"));
-        names.extend(toml_names_in_dir(
-            &helix_loader::config_dir().join("themes"),
-        ));
-        names.push("default".into());
-        names.push("base16_default".into());
-        names.sort();
-        names.dedup();
-
-        let mut names: Vec<_> = names
-            .into_iter()
-            .map(|name| ((0..), Cow::from(name)))
-            .collect();
-
-        let matcher = Matcher::default();
-
-        let mut matches: Vec<_> = names
-            .into_iter()
-            .filter_map(|(_range, name)| {
-                matcher.fuzzy_match(&name, input).map(|score| (name, score))
-            })
-            .collect();
-
-        matches.sort_unstable_by(|(name1, score1), (name2, score2)| {
-            (Reverse(*score1), name1).cmp(&(Reverse(*score2), name2))
-        });
-        names = matches.into_iter().map(|(name, _)| ((0..), name)).collect();
-
-        names
+        toml_filenames(
+            &[
+                helix_loader::runtime_dir().join("themes"),
+                helix_loader::config_dir().join("themes"),
+            ],
+            &["default", "base16_default"],
+            input,
+        )
     }
 
     pub fn icons(_editor: &Editor, input: &str) -> Vec<Completion> {
-        let mut names = toml_names_in_dir(&helix_loader::runtime_dir().join("icons"));
-        names.extend(toml_names_in_dir(&helix_loader::config_dir().join("icons")));
-        names.push("default".into());
-        names.sort();
-        names.dedup();
-
-        let mut names: Vec<_> = names
-            .into_iter()
-            .map(|name| ((0..), Cow::from(name)))
-            .collect();
-
-        let matcher = Matcher::default();
-
-        let mut matches: Vec<_> = names
-            .into_iter()
-            .filter_map(|(_range, name)| {
-                matcher.fuzzy_match(&name, input).map(|score| (name, score))
-            })
-            .collect();
-
-        matches.sort_unstable_by(|(name1, score1), (name2, score2)| {
-            (Reverse(*score1), name1).cmp(&(Reverse(*score2), name2))
-        });
-        names = matches.into_iter().map(|(name, _)| ((0..), name)).collect();
-
-        names
+        toml_filenames(
+            &[
+                helix_loader::runtime_dir().join("icons"),
+                helix_loader::config_dir().join("icons"),
+            ],
+            &["default"],
+            input,
+        )
     }
 
     /// Recursive function to get all keys from this value and add them to vec
