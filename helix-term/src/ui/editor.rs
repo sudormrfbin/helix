@@ -549,24 +549,19 @@ impl EditorView {
         let icons_enabled = config.icons.bufferline();
 
         for doc in editor.documents() {
-            // Determine icon based on language name if possible
-            let mut filetype_icon = None;
-            if let Some(language_config) = doc.language_config() {
-                for filetype in &language_config.file_types {
-                    let filetype_str = match filetype {
-                        helix_core::syntax::FileType::Extension(s) => s,
-                        helix_core::syntax::FileType::Suffix(s) => s,
-                    };
-                    filetype_icon = editor.icons.icon_from_filetype(filetype_str);
-                    if filetype_icon.is_some() {
-                        break;
-                    }
-                }
-            }
-            // Otherwise based on filetype
-            if filetype_icon.is_none() {
-                filetype_icon = editor.icons.icon_from_path(doc.path());
-            }
+            let filetype_icon = doc
+                .language_config()
+                .and_then(|config| {
+                    config
+                        .file_types
+                        .iter()
+                        .map(|filetype| match filetype {
+                            helix_core::syntax::FileType::Extension(s) => s,
+                            helix_core::syntax::FileType::Suffix(s) => s,
+                        })
+                        .find_map(|filetype| editor.icons.icon_from_filetype(&filetype))
+                })
+                .or_else(|| editor.icons.icon_from_path(doc.path()));
 
             let fname = doc
                 .path()
