@@ -11,6 +11,7 @@ Example config:
 
 ```toml
 theme = "onedark"
+icons = "nerdfonts"
 
 [editor]
 line-number = "relative"
