@@ -74,8 +74,9 @@ pub struct Application {
 
     config: Arc<ArcSwap<Config>>,
 
-    #[allow(dead_code)]
+    // #[allow(dead_code)]
     theme_loader: Arc<theme::Loader>,
+    icons_loader: Arc<icons::Loader>,
     #[allow(dead_code)]
     syn_loader: Arc<syntax::Loader>,
 
@@ -189,7 +190,7 @@ impl Application {
         let mut editor = Editor::new(
             area,
             theme_loader.clone(),
-            icons_loader,
+            icons_loader.clone(),
             syn_loader.clone(),
             Arc::new(Map::new(Arc::clone(&config), |config: &Config| {
                 &config.editor
@@ -286,6 +287,7 @@ impl Application {
             config,
 
             theme_loader,
+            icons_loader,
             syn_loader,
 
             signals,
@@ -455,12 +457,27 @@ impl Application {
         Ok(())
     }
 
+    /// Refresh icons after config change
+    fn refresh_icons(&mut self, config: &Config) -> Result<(), Error> {
+        if let Some(icons) = config.icons.clone() {
+            let true_color = self.true_color();
+            let icons = self
+                .icons_loader
+                .load(&icons, &self.editor.theme, true_color)
+                .map_err(|err| anyhow::anyhow!("Failed to load icons `{}`: {}", icons, err))?;
+            self.editor.set_icons(icons);
+        }
+
+        Ok(())
+    }
+
     fn refresh_config(&mut self) {
         let mut refresh_config = || -> Result<(), Error> {
             let default_config = Config::load_default()
                 .map_err(|err| anyhow::anyhow!("Failed to load config: {}", err))?;
             self.refresh_language_config()?;
             self.refresh_theme(&default_config)?;
+            self.refresh_icons(&default_config)?;
             // Store new config
             self.config.store(Arc::new(default_config));
             Ok(())
