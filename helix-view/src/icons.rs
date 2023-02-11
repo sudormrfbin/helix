@@ -19,7 +19,7 @@ pub static BLANK_ICON: Icon = Icon {
 
 /// The style of an icon can either be defined by the TOML file, or by the theme.
 /// We need to remember that in order to reload the icons colors when the theme changes.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IconStyle {
     Custom(Style),
     Default(Style),
@@ -40,7 +40,7 @@ impl From<IconStyle> for Style {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "kebab-case", deny_unknown_fields)]
 pub struct Icon {
     #[serde(rename = "icon")]
@@ -59,7 +59,7 @@ impl Icon {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "kebab-case", deny_unknown_fields)]
 pub struct Icons {
     pub name: String,
@@ -143,7 +143,7 @@ impl Icons {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "kebab-case", deny_unknown_fields)]
 pub struct Diagnostic {
     pub error: Icon,
@@ -152,14 +152,14 @@ pub struct Diagnostic {
     pub hint: Icon,
 }
 
-#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "kebab-case", deny_unknown_fields)]
 pub struct Breakpoint {
     pub verified: Icon,
     pub unverified: Icon,
 }
 
-#[derive(Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "kebab-case", deny_unknown_fields)]
 pub struct Diff {
     pub added: Icon,

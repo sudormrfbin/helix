@@ -1,3 +1,4 @@
+use std::fmt::Write;
 use std::ops::Deref;
 
 use crate::job::Job;
@@ -1127,7 +1128,7 @@ fn get_character_info(
                 codepoint
             };
 
-            unicode.push_str(&format!("{codepoint:0>4x}"));
+            write!(unicode, "{codepoint:0>4x}").unwrap();
         }
 
         unicode.push(')');
@@ -1168,7 +1169,7 @@ fn get_character_info(
             }
 
             for byte in &bytes[current_byte..] {
-                hex.push_str(&format!(" {byte:0>2x}"));
+                write!(hex, " {byte:0>2x}").unwrap();
             }
 
             current_byte = bytes.len();
