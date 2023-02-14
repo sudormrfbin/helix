@@ -1,6 +1,11 @@
 use crate::compositor::{Component, Context, Event, EventResult};
-use helix_view::{editor::CompleteAction, icons::Icons, ViewId};
-use tui::buffer::Buffer as Surface;
+use helix_view::{
+    editor::CompleteAction,
+    icons::Icons,
+    theme::{Modifier, Style},
+    ViewId,
+};
+use tui::{buffer::Buffer as Surface, text::Span};
 
 use std::borrow::Cow;
 
@@ -34,8 +39,19 @@ impl menu::Item for CompletionItem {
 
     // Before implementing icons for the `CompletionItemKind`s, something must be done to `Menu::required_size` and `Menu::recalculate_size` in order to have correct sizes even with icons.
     fn format<'a>(&self, _data: &Self::Data, _icons: Option<&'a Icons>) -> menu::Row {
+        let deprecated = self.deprecated.unwrap_or_default()
+            || self.tags.as_ref().map_or(false, |tags| {
+                tags.contains(&lsp::CompletionItemTag::DEPRECATED)
+            });
         menu::Row::new(vec![
-            menu::Cell::from(self.label.as_str()),
+            menu::Cell::from(Span::styled(
+                self.label.as_str(),
+                if deprecated {
+                    Style::default().add_modifier(Modifier::CROSSED_OUT)
+                } else {
+                    Style::default()
+                },
+            )),
             menu::Cell::from(match self.kind {
                 Some(lsp::CompletionItemKind::TEXT) => "text",
                 Some(lsp::CompletionItemKind::METHOD) => "method",
