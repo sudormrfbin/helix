@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Adding textobject queries</title>
+        <title>Adding injection queries</title>
 
 
         <!-- Custom HTML head -->
@@ -89,7 +89,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../title-page.html">Helix</a></li><li class="chapter-item expanded "><a href="../install.html"><strong aria-hidden="true">1.</strong> Installation</a></li><li class="chapter-item expanded "><a href="../usage.html"><strong aria-hidden="true">2.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../keymap.html"><strong aria-hidden="true">2.1.</strong> Keymap</a></li><li class="chapter-item expanded "><a href="../commands.html"><strong aria-hidden="true">2.2.</strong> Commands</a></li><li class="chapter-item expanded "><a href="../lang-support.html"><strong aria-hidden="true">2.3.</strong> Language support</a></li></ol></li><li class="chapter-item expanded "><a href="../from-vim.html"><strong aria-hidden="true">3.</strong> Migrating from Vim</a></li><li class="chapter-item expanded "><a href="../configuration.html"><strong aria-hidden="true">4.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../themes.html"><strong aria-hidden="true">4.1.</strong> Themes</a></li><li class="chapter-item expanded "><a href="../remapping.html"><strong aria-hidden="true">4.2.</strong> Key remapping</a></li><li class="chapter-item expanded "><a href="../languages.html"><strong aria-hidden="true">4.3.</strong> Languages</a></li></ol></li><li class="chapter-item expanded "><a href="../guides/index.html"><strong aria-hidden="true">5.</strong> Guides</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../guides/adding_languages.html"><strong aria-hidden="true">5.1.</strong> Adding languages</a></li><li class="chapter-item expanded "><a href="../guides/textobject.html" class="active"><strong aria-hidden="true">5.2.</strong> Adding textobject queries</a></li><li class="chapter-item expanded "><a href="../guides/indent.html"><strong aria-hidden="true">5.3.</strong> Adding indent queries</a></li><li class="chapter-item expanded "><a href="../guides/injection.html"><strong aria-hidden="true">5.4.</strong> Adding injection queries</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../title-page.html">Helix</a></li><li class="chapter-item expanded "><a href="../install.html"><strong aria-hidden="true">1.</strong> Installation</a></li><li class="chapter-item expanded "><a href="../usage.html"><strong aria-hidden="true">2.</strong> Usage</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../keymap.html"><strong aria-hidden="true">2.1.</strong> Keymap</a></li><li class="chapter-item expanded "><a href="../commands.html"><strong aria-hidden="true">2.2.</strong> Commands</a></li><li class="chapter-item expanded "><a href="../lang-support.html"><strong aria-hidden="true">2.3.</strong> Language support</a></li></ol></li><li class="chapter-item expanded "><a href="../from-vim.html"><strong aria-hidden="true">3.</strong> Migrating from Vim</a></li><li class="chapter-item expanded "><a href="../configuration.html"><strong aria-hidden="true">4.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../themes.html"><strong aria-hidden="true">4.1.</strong> Themes</a></li><li class="chapter-item expanded "><a href="../remapping.html"><strong aria-hidden="true">4.2.</strong> Key remapping</a></li><li class="chapter-item expanded "><a href="../languages.html"><strong aria-hidden="true">4.3.</strong> Languages</a></li></ol></li><li class="chapter-item expanded "><a href="../guides/index.html"><strong aria-hidden="true">5.</strong> Guides</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../guides/adding_languages.html"><strong aria-hidden="true">5.1.</strong> Adding languages</a></li><li class="chapter-item expanded "><a href="../guides/textobject.html"><strong aria-hidden="true">5.2.</strong> Adding textobject queries</a></li><li class="chapter-item expanded "><a href="../guides/indent.html"><strong aria-hidden="true">5.3.</strong> Adding indent queries</a></li><li class="chapter-item expanded "><a href="../guides/injection.html" class="active"><strong aria-hidden="true">5.4.</strong> Adding injection queries</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -150,7 +150,7 @@
                         <a href="https://github.com/helix-editor/helix" title="Git repository" aria-label="Git repository">
                             <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
-                        <a href="https://github.com/helix-editor/helix/edit/master/book/src/guides/textobject.md" title="Suggest an edit" aria-label="Suggest an edit">
+                        <a href="https://github.com/helix-editor/helix/edit/master/book/src/guides/injection.md" title="Suggest an edit" aria-label="Suggest an edit">
                             <i id="git-edit-button" class="fa fa-edit"></i>
                         </a>
 
@@ -179,57 +179,84 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="adding-textobject-queries"><a class="header" href="#adding-textobject-queries">Adding textobject queries</a></h1>
-<p>Helix supports textobjects that are language specific, such as functions, classes, etc.
-These textobjects require an accompanying tree-sitter grammar and a <code>textobjects.scm</code> query file
-to work properly. Tree-sitter allows us to query the source code syntax tree
-and capture specific parts of it. The queries are written in a lisp dialect.
-More information on how to write queries can be found in the <a href="https://tree-sitter.github.io/tree-sitter/using-parsers#query-syntax">official tree-sitter
-documentation</a>.</p>
-<p>Query files should be placed in <code>runtime/queries/{language}/textobjects.scm</code>
-when contributing to Helix. Note that to test the query files locally you should put
-them under your local runtime directory (<code>~/.config/helix/runtime</code> on Linux
-for example).</p>
-<p>The following <a href="https://tree-sitter.github.io/tree-sitter/using-parsers#capturing-nodes">captures</a> are recognized:</p>
-<div class="table-wrapper"><table><thead><tr><th>Capture Name</th></tr></thead><tbody>
-<tr><td><code>function.inside</code></td></tr>
-<tr><td><code>function.around</code></td></tr>
-<tr><td><code>class.inside</code></td></tr>
-<tr><td><code>class.around</code></td></tr>
-<tr><td><code>test.inside</code></td></tr>
-<tr><td><code>test.around</code></td></tr>
-<tr><td><code>parameter.inside</code></td></tr>
-<tr><td><code>comment.inside</code></td></tr>
-<tr><td><code>comment.around</code></td></tr>
-<tr><td><code>entry.inside</code></td></tr>
-<tr><td><code>entry.around</code></td></tr>
-</tbody></table>
-</div>
-<p><a href="https://github.com/search?q=repo%3Ahelix-editor%2Fhelix+path%3A%2A%2A/textobjects.scm&amp;type=Code&amp;ref=advsearch&amp;l=&amp;l=">Example query files</a> can be found in the helix GitHub repository.</p>
-<h2 id="queries-for-textobject-based-navigation"><a class="header" href="#queries-for-textobject-based-navigation">Queries for textobject based navigation</a></h2>
-<p>Tree-sitter based navigation in Helix is done using captures in the
-following order:</p>
+                        <h1 id="adding-injection-queries"><a class="header" href="#adding-injection-queries">Adding Injection Queries</a></h1>
+<p>Writing language injection queries allows one to highlight a specific node as a different language.
+In addition to the <a href="http://tree-sitter.github.io/tree-sitter/syntax-highlighting#language-injection">standard</a> language injection options used by tree-sitter, there
+are a few Helix specific extensions that allow for more control.</p>
+<p>And example of a simple query that would highlight all strings as bash in Nix:</p>
+<pre><code class="language-scm">((string_expression (string_fragment) @injection.content)
+  (#set! injection.language "bash"))
+</code></pre>
+<h2 id="capture-types"><a class="header" href="#capture-types">Capture Types</a></h2>
 <ul>
-<li><code>object.movement</code></li>
-<li><code>object.around</code></li>
-<li><code>object.inside</code></li>
+<li>
+<p><code>@injection.language</code> (standard):
+The captured node may contain the language name used to highlight the node captured by
+<code>@injection.content</code>.</p>
+</li>
+<li>
+<p><code>@injection.content</code> (standard):
+Marks the content to be highlighted as the language captured with <code>@injection.language</code> <em>et al</em>.</p>
+</li>
+<li>
+<p><code>@injection.filename</code> (extension):
+The captured node may contain a filename with a file-extension known to Helix,
+highlighting <code>@injection.content</code> as that language. This uses the language extensions defined in
+both the default languages.toml distributed with Helix, as well as user defined languages.</p>
+</li>
+<li>
+<p><code>@injection.shebang</code> (extension):
+The captured node may contain a shebang used to choose a language to highlight as. This also uses
+the shebangs defined in the default and user <code>languages.toml</code>.</p>
+</li>
 </ul>
-<p>For example if a <code>function.around</code> capture has been already defined for a language
-in its <code>textobjects.scm</code> file, function navigation should also work automatically.
-<code>function.movement</code> should be defined only if the node captured by <code>function.around</code>
-doesn't make sense in a navigation context.</p>
+<h2 id="settings"><a class="header" href="#settings">Settings</a></h2>
+<ul>
+<li>
+<p><code>injection.combined</code> (standard):
+Indicates that all the matching nodes in the tree should have their content parsed as one
+nested document.</p>
+</li>
+<li>
+<p><code>injection.language</code> (standard):
+Forces the captured content to be highlighted as the given language</p>
+</li>
+<li>
+<p><code>injection.include-children</code> (standard):
+Indicates that the content node’s entire text should be re-parsed, including the text of its child
+nodes. By default, child nodes’ text will be excluded from the injected document.</p>
+</li>
+<li>
+<p><code>injection.include-unnamed-children</code> (extension):
+Same as <code>injection.include-children</code> but only for unnamed child nodes.</p>
+</li>
+</ul>
+<h2 id="predicates"><a class="header" href="#predicates">Predicates</a></h2>
+<ul>
+<li>
+<p><code>#eq?</code> (standard):
+The first argument (a capture) must be equal to the second argument
+(a capture or a string).</p>
+</li>
+<li>
+<p><code>#match?</code> (standard):
+The first argument (a capture) must match the regex given in the
+second argument (a string).</p>
+</li>
+<li>
+<p><code>#any-of?</code> (standard):
+The first argument (a capture) must be one of the other arguments (strings).</p>
+</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../guides/adding_languages.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../guides/indent.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../guides/indent.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -237,13 +264,10 @@ doesn't make sense in a navigation context.</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../guides/adding_languages.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../guides/indent.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../guides/indent.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
             </nav>
 
         </div>
